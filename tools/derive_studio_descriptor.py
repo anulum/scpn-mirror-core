@@ -58,7 +58,6 @@ def derive_descriptor(manifest_path: Path) -> dict[str, Any]:
     studio = manifest.get("studio_integration", {})
     registry = manifest.get("spo_registry", {})
     protection = manifest.get("machine_protection", {})
-    protection = manifest.get("machine_protection", {})
     return {
         "schema": DESCRIPTOR_SCHEMA,
         "schema_version": DESCRIPTOR_SCHEMA_VERSION,
