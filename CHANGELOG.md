@@ -14,6 +14,16 @@ SCPN Mirror Core — CHANGELOG
 
 ### Added
 
+- Diagnostic and clock semantics model
+  (`src/scpn_mirror_core/observability.py`), the second implemented
+  capability at `computational_prototype`: frozen clock, channel,
+  deferral, and plan objects aligned fail-closed with the pinned SPO
+  observability-profile catalogue (candidate applicability, carrier
+  admissibility, exact class-fixed evidence vocabularies, clock-kind
+  compatibility, Nyquist bounds); cited advisory band checks; canonical
+  serialisation with SHA-256 digests and strict NaN-rejecting round-trip
+  parsing (design record `docs/adr/0003-diagnostic-clock-semantics.md`).
+
 - Device configuration model (`src/scpn_mirror_core/`), the first implemented
   capability at `computational_prototype`: validated frozen parameter
   objects with device-specific invariants and documented, cited

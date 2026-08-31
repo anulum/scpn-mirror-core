@@ -31,23 +31,29 @@ this repository until it appears in the capability inventory with evidence.
   registry data pin; `computational_prototype` (ADR 0002,
   `VALIDATION.md#device-configuration-model`). Plugging schemes and
   heating/beam inventory remain future work under the same capability.
+- **Diagnostic and clock semantics** (landed 2026-08-31) — synthetic
+  diagnostic-channel and clock declarations aligned fail-closed with the
+  pinned SPO observability-profile catalogue (release `1.0.0`): candidate
+  applicability, carrier admissibility, exact evidence vocabularies,
+  clock-kind compatibility, Nyquist bounds, canonical digests; the
+  reference plan mirrors canonical practice (diamagnetic loop, drive reference, end-loss array, flute probe array, synthetic oscillator);
+  `computational_prototype` (ADR 0003,
+  `VALIDATION.md#diagnostic-and-clock-semantics`). No ingress is
+  declared; the SPO semantic-profile state remains `not_declared`.
 
 ## Planned (no implementation exists; ordering is not a commitment)
-1. **Diagnostic and clock semantics** — declared axial-profile channels,
-   end-loss analysers, velocity-space indicators, and clock identities
-   aligned with the SCPN Phase Orchestrator semantic profile.
-2. **Safety-envelope declaration** — machine-readable operational envelope
+1. **Safety-envelope declaration** — machine-readable operational envelope
    (coil, beam, potential, and end-tank bounds) consumed by the CONTROL
    adapter contract.
-3. **CONTROL adapter implementation** — device-owned adapter against the
+2. **CONTROL adapter implementation** — device-owned adapter against the
    published specification, with replay fixtures and HIL evidence,
    targeting `control_research_ready` only after replay and HIL
    acceptance.
-4. **Solver seam consumption** — versioned consumption of exact
+3. **Solver seam consumption** — versioned consumption of exact
    `SCPN-FUSION-CORE` seams for open-field-line transport and
    velocity-space surfaces, strictly after the family migration gate
    proves exact replacement; no solver code is copied.
-5. **Facility-data correlation** — preregistered acceptance contracts
+4. **Facility-data correlation** — preregistered acceptance contracts
    against identified facility or published experimental data, targeting
    `experiment_correlated` per capability.
 
