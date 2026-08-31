@@ -18,6 +18,7 @@ path = [
     "studio/portfolio-descriptor.schema.json",
     "studio/portfolio-descriptor.schema.json",
     "capability-inventory.json",
+    "tests/data/plan_envelope_fixture.json",
     ".zenodo.json",
     ".github/FUNDING.yml",
 ]
