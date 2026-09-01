@@ -8,6 +8,11 @@ Contact: www.anulum.li | protoscience@anulum.li
 SCPN Mirror Core — README
 -->
 
+<div align="center">
+  <img src="docs/assets/repo_header.png"
+       alt="SCPN Mirror Core — The Magnetic Bottle, Declared Truth">
+</div>
+
 # SCPN Mirror Core
 
 Governed device-family repository for magnetic-mirror fusion systems within
