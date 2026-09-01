@@ -38,7 +38,7 @@ from scpn_mirror_core.observability import (
 )
 
 ENVELOPE_SCHEMA: Final = "scpn.reactor-diagnostic-plan-envelope.v1"
-ENVELOPE_SCHEMA_VERSION: Final = "1.1.0"
+ENVELOPE_SCHEMA_VERSION: Final = "1.2.0"
 PROJECT: Final = "SCPN-MIRROR-CORE"
 CAPABILITY: Final = "diagnostic_clock_semantics"
 EVIDENCE_MATURITY: Final = "computational_prototype"

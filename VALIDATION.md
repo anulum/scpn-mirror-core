@@ -173,3 +173,39 @@ canonical bytes is rejected). The envelope is `1.1.0`, adding
 `reactor-domain.json` — verified in tests against the committed file.
 All declarations remain synthetic; nothing here observes or controls
 anything.
+
+### Signal inventories, frame transformations, and clock topology
+
+The depth slice (envelope `1.2.0`; a `1.1.0` document is refused by the
+`1.2.0` codec and vice versa — no defaults, no cross-version coercion;
+`1.1.0` remains historical custody at the consumer) adds three typed
+declaration surfaces, every branch under the 100 % statement-and-branch
+gate:
+
+- A per-channel **signal inventory** (`SignalDeclaration`: identifier,
+  quantity, unit, role, description). Hard rules: non-empty, unique and
+  sorted; exactly one `carrier`; no `timing_marker` (no
+  event-relative candidate is applicable); numerical-only
+  channels declare a single `phase`/`rad` carrier. Quantity and unit are
+  declared tokens — no SI or UCUM validation is performed or claimed —
+  and no declaration creates or overrides a candidate, carrier,
+  observation, or phase: the candidate profile stays authoritative. An
+  advisory flags a multi-element cyclic array without an amplitude
+  signal.
+- **Frame transformations** (`FrameTransformation`) between declared
+  frames: kind admissibility fixed by frame-kind pair (`flux_mapping`
+  for machine↔flux, flux↔Boozer, field-line↔machine; `projection` for
+  blanket↔machine; `rigid` for chamber↔beamline), `equilibrium_dependent`
+  exactly for flux mappings, at most one transformation per frame pair,
+  sorted by source then target, and — with two or more frames — a
+  connected transformation graph. Methods are declarations;
+  `evidence_claimed` is always `False`.
+- A **clock topology** (`ClockDomain`, `ClockTopology`): every physical
+  clock in exactly one domain, the simulation clock in none; a domain
+  holding a facility clock is rooted there, otherwise at its shot-event
+  epoch; every non-root member declares a relation to its root; every
+  non-reference root declares a relation to the reference root (star);
+  relations must not form a cycle. The reference plan declares one
+  domain (`clk_facility` root, `clk_shot` member); multi-domain rules
+  are exercised by test-constructed plans. Scopes are declarations;
+  `mapping_state` stays `unmapped`.

@@ -14,6 +14,7 @@ diagnostic, measurement, or facility.
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 from typing import Any
@@ -27,17 +28,23 @@ from scpn_mirror_core.observability import (
     OBSERVABILITY_CATALOGUE_DIGEST,
     OBSERVABILITY_CATALOGUE_VERSION,
     CandidateProfile,
+    ClockDomain,
     ClockKind,
     ClockModel,
     ClockRelation,
+    ClockTopology,
     DeferredCandidate,
     DiagnosticChannelPlan,
     DiagnosticPlan,
     FrameKind,
+    FrameTransformation,
     ObservabilityBinding,
     ObservabilityClass,
     ReferenceFrame,
     SemanticCarrier,
+    SignalDeclaration,
+    SignalRole,
+    TransformationKind,
     plan_from_bytes,
     plan_from_record,
 )
@@ -110,6 +117,115 @@ CLOCK_RELATIONS = (
     ),
 )
 
+SIGNALS_CH_DIAMAGNETIC_LOOP = (
+    SignalDeclaration(
+        identifier="sig_diamagnetic_flux",
+        quantity="magnetic_flux",
+        unit="Wb",
+        role=SignalRole.CARRIER,
+        description="synthetic diamagnetic flux",
+    ),
+)
+SIGNALS_CH_DRIVE_REFERENCE = (
+    SignalDeclaration(
+        identifier="sig_drive_frequency",
+        quantity="frequency",
+        unit="Hz",
+        role=SignalRole.AUXILIARY,
+        description="declared drive frequency",
+    ),
+    SignalDeclaration(
+        identifier="sig_drive_phase",
+        quantity="phase",
+        unit="rad",
+        role=SignalRole.CARRIER,
+        description="synthetic drive reference phase",
+    ),
+)
+SIGNALS_CH_END_LOSS_ARRAY = (
+    SignalDeclaration(
+        identifier="sig_analyser_energy",
+        quantity="energy",
+        unit="eV",
+        role=SignalRole.AUXILIARY,
+        description="declared analyser energy setting",
+    ),
+    SignalDeclaration(
+        identifier="sig_end_loss_flux",
+        quantity="particle_flux",
+        unit="m^-2/s",
+        role=SignalRole.CARRIER,
+        description="synthetic end-loss particle flux",
+    ),
+)
+SIGNALS_CH_FLUTE_PROBE_ARRAY = (
+    SignalDeclaration(
+        identifier="sig_mode_amplitude",
+        quantity="magnetic_flux_density",
+        unit="T",
+        role=SignalRole.AMPLITUDE,
+        description="synthetic flute-mode amplitude",
+    ),
+    SignalDeclaration(
+        identifier="sig_mode_number",
+        quantity="mode_number",
+        unit="1",
+        role=SignalRole.AUXILIARY,
+        description="declared toroidal or azimuthal mode label",
+    ),
+    SignalDeclaration(
+        identifier="sig_mode_phase",
+        quantity="phase",
+        unit="rad",
+        role=SignalRole.CARRIER,
+        description="synthetic mode phase",
+    ),
+)
+SIGNALS_CH_SYNTHETIC_OSCILLATOR = (
+    SignalDeclaration(
+        identifier="sig_phase",
+        quantity="phase",
+        unit="rad",
+        role=SignalRole.CARRIER,
+        description="model-owned synthetic oscillator phase",
+    ),
+)
+REFERENCE_TRANSFORMATIONS: tuple[FrameTransformation, ...] = (
+    FrameTransformation(
+        source_identifier="frm_axial",
+        target_identifier="frm_field_line",
+        kind=TransformationKind.FLUX_MAPPING,
+        equilibrium_dependent=True,
+        method=(
+            "synthetic declaration: mapping between the declared frames; "
+            "no mapping evidence claimed"
+        ),
+        evidence_claimed=False,
+    ),
+)
+CLOCK_TOPOLOGY = ClockTopology(
+    domains=(
+        ClockDomain(
+            identifier="dom_facility",
+            root_clock_identifier="clk_facility",
+            member_clock_identifiers=("clk_facility", "clk_shot"),
+            scope="facility master timing and the shot trigger bound to it",
+        ),
+    ),
+    reference_domain_identifier="dom_facility",
+)
+SHOT_ONLY_TOPOLOGY = ClockTopology(
+    domains=(
+        ClockDomain(
+            identifier="dom_shot",
+            root_clock_identifier="clk_shot",
+            member_clock_identifiers=("clk_shot",),
+            scope="shot trigger only; no facility clock in this variant",
+        ),
+    ),
+    reference_domain_identifier="dom_shot",
+)
+
 
 def clock_facility() -> ClockModel:
     """Build the synthetic facility master clock."""
@@ -158,6 +274,7 @@ def channel_diamagnetic() -> DiagnosticChannelPlan:
         acquisition_duration_s=5.0,
         element_count=1,
         evidence_bindings=dict(NONCYCLIC_BINDINGS),
+        signals=SIGNALS_CH_DIAMAGNETIC_LOOP,
         synthetic=True,
     )
 
@@ -176,6 +293,7 @@ def channel_drive_reference() -> DiagnosticChannelPlan:
         acquisition_duration_s=5.0,
         element_count=1,
         evidence_bindings=dict(DIRECT_BINDINGS),
+        signals=SIGNALS_CH_DRIVE_REFERENCE,
         synthetic=True,
     )
 
@@ -194,6 +312,7 @@ def channel_end_loss() -> DiagnosticChannelPlan:
         acquisition_duration_s=5.0,
         element_count=8,
         evidence_bindings=dict(NONCYCLIC_BINDINGS),
+        signals=SIGNALS_CH_END_LOSS_ARRAY,
         synthetic=True,
     )
 
@@ -212,6 +331,7 @@ def channel_flute_probes() -> DiagnosticChannelPlan:
         acquisition_duration_s=5.0,
         element_count=16,
         evidence_bindings=dict(DERIVED_BINDINGS),
+        signals=SIGNALS_CH_FLUTE_PROBE_ARRAY,
         synthetic=True,
     )
 
@@ -230,6 +350,7 @@ def channel_oscillator() -> DiagnosticChannelPlan:
         acquisition_duration_s=1.0,
         element_count=1,
         evidence_bindings=dict(NUMERICAL_BINDINGS),
+        signals=SIGNALS_CH_SYNTHETIC_OSCILLATOR,
         synthetic=True,
     )
 
@@ -242,6 +363,8 @@ def synthetic_plan() -> DiagnosticPlan:
         clocks=(clock_facility(), clock_shot(), clock_simulation()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel_drive_reference(),
@@ -438,6 +561,7 @@ def _derived(**overrides: Any) -> DiagnosticChannelPlan:
         "acquisition_duration_s": 5.0,
         "element_count": 16,
         "evidence_bindings": dict(DERIVED_BINDINGS),
+        "signals": SIGNALS_CH_FLUTE_PROBE_ARRAY,
         "synthetic": True,
     }
     values.update(overrides)
@@ -474,6 +598,639 @@ def test_parser_rejects_numeric_timing_uncertainty() -> None:
     record["channels"][0]["timing_uncertainty_s"] = 1.0e-5
     with pytest.raises(DiagnosticPlanError, match="only event-relative"):
         plan_from_record(record)
+
+
+def _plan_with(**overrides: Any) -> DiagnosticPlan:
+    """Rebuild the synthetic plan with keyword overrides applied."""
+    plan = synthetic_plan()
+    values: dict[str, Any] = {
+        "identifier": plan.identifier,
+        "binding": plan.binding,
+        "clocks": plan.clocks,
+        "frames": plan.frames,
+        "clock_relations": plan.clock_relations,
+        "frame_transformations": plan.frame_transformations,
+        "clock_topology": plan.clock_topology,
+        "channels": plan.channels,
+        "deferrals": plan.deferrals,
+    }
+    values.update(overrides)
+    return DiagnosticPlan(**values)
+
+
+def _signal(**overrides: Any) -> SignalDeclaration:
+    """Build an auxiliary signal with keyword overrides applied."""
+    values: dict[str, Any] = {
+        "identifier": "sig_zz_extra",
+        "quantity": "current",
+        "unit": "A",
+        "role": SignalRole.AUXILIARY,
+        "description": "synthetic auxiliary signal",
+    }
+    values.update(overrides)
+    return SignalDeclaration(**values)
+
+
+def _transformation(**overrides: Any) -> FrameTransformation:
+    """Build a transformation with keyword overrides applied."""
+    values: dict[str, Any] = {
+        "source_identifier": "frm_axial",
+        "target_identifier": "frm_field_line",
+        "kind": TransformationKind.FLUX_MAPPING,
+        "equilibrium_dependent": True,
+        "method": "synthetic declaration",
+        "evidence_claimed": False,
+    }
+    values.update(overrides)
+    return FrameTransformation(**values)
+
+
+def _extra_frame(identifier: str) -> ReferenceFrame:
+    """Build an additional synthetic frame of an allowed kind."""
+    return ReferenceFrame(
+        identifier=identifier,
+        kind=FrameKind.FIELD_LINE,
+        description="additional synthetic frame",
+    )
+
+
+def _relation(child: str, parent: str) -> ClockRelation:
+    """Build a synthetic unmapped relation between two declared clocks."""
+    return ClockRelation(
+        child_identifier=child,
+        parent_identifier=parent,
+        max_offset_s=1.0e-6,
+        uncertainty_s=1.0e-7,
+        method="synthetic declaration; no correlation evidence claimed",
+        mapping_state="unmapped",
+        evidence_claimed=False,
+    )
+
+
+def _second_facility() -> ClockModel:
+    """Build a second synthetic facility clock for multi-domain variants."""
+    return ClockModel(
+        identifier="clk_facility_b",
+        kind=ClockKind.FACILITY_MONOTONIC,
+        epoch="second facility oscillator zero",
+        resolution_s=1.0e-8,
+        uncertainty_s=5.0e-9,
+    )
+
+
+def _two_domain_topology() -> ClockTopology:
+    """Build a two-domain topology over the reference clocks plus a second facility."""
+    return ClockTopology(
+        domains=(
+            ClockDomain(
+                identifier="dom_facility",
+                root_clock_identifier="clk_facility",
+                member_clock_identifiers=("clk_facility", "clk_shot"),
+                scope="primary facility timing",
+            ),
+            ClockDomain(
+                identifier="dom_facility_b",
+                root_clock_identifier="clk_facility_b",
+                member_clock_identifiers=("clk_facility_b",),
+                scope="secondary facility timing",
+            ),
+        ),
+        reference_domain_identifier="dom_facility",
+    )
+
+
+def _topology(*domains: ClockDomain, reference: str = "dom_facility") -> ClockTopology:
+    """Build a topology from domains sorted by identifier."""
+    return ClockTopology(
+        domains=tuple(sorted(domains, key=lambda domain: domain.identifier)),
+        reference_domain_identifier=reference,
+    )
+
+
+def test_signal_rejects_malformed_identifier() -> None:
+    """A malformed signal identifier is rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"signal\.identifier"):
+        _signal(identifier="Sig!")
+
+
+def test_signal_rejects_empty_quantity() -> None:
+    """An empty quantity is rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"signal\.quantity"):
+        _signal(quantity="")
+
+
+@pytest.mark.parametrize("unit", ["", "m s", "\tA"])
+def test_signal_rejects_bad_unit_token(unit: str) -> None:
+    """The unit must be a non-empty token without whitespace."""
+    with pytest.raises(DiagnosticPlanError, match=r"signal\.unit"):
+        _signal(unit=unit)
+
+
+def test_signal_rejects_empty_description() -> None:
+    """An empty description is rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"signal\.description"):
+        _signal(description="")
+
+
+def test_channel_rejects_empty_signal_inventory() -> None:
+    """A channel must declare at least one signal."""
+    with pytest.raises(DiagnosticPlanError, match="at least one signal"):
+        _derived(signals=())
+
+
+def test_channel_rejects_unsorted_or_duplicate_signals() -> None:
+    """Signal identifiers must be unique and sorted."""
+    with pytest.raises(DiagnosticPlanError, match="unique and sorted"):
+        _derived(signals=tuple(reversed(SIGNALS_CH_FLUTE_PROBE_ARRAY)))
+    with pytest.raises(DiagnosticPlanError, match="unique and sorted"):
+        _derived(
+            signals=(*SIGNALS_CH_FLUTE_PROBE_ARRAY, SIGNALS_CH_FLUTE_PROBE_ARRAY[-1])
+        )
+
+
+@pytest.mark.parametrize("count", [0, 2])
+def test_channel_requires_exactly_one_carrier_signal(count: int) -> None:
+    """Exactly one carrier signal is required."""
+    carriers = tuple(
+        _signal(identifier=f"sig_zz_carrier_{index}", role=SignalRole.CARRIER)
+        for index in range(count)
+    )
+    with pytest.raises(DiagnosticPlanError, match="exactly one carrier"):
+        _derived(signals=(_signal(identifier="sig_aa"), *carriers))
+
+
+def test_non_event_channel_rejects_timing_marker() -> None:
+    """Only event-relative channels declare a timing marker."""
+    marker = _signal(
+        identifier="sig_zz_marker", unit="s", role=SignalRole.TIMING_MARKER
+    )
+    with pytest.raises(DiagnosticPlanError, match="only event-relative"):
+        _derived(signals=(*SIGNALS_CH_FLUTE_PROBE_ARRAY, marker))
+
+
+@pytest.mark.parametrize(
+    "signals",
+    [
+        (SIGNALS_CH_SYNTHETIC_OSCILLATOR[0], _signal(identifier="sig_zz_extra")),
+        (
+            _signal(
+                identifier="sig_phase",
+                quantity="angle",
+                unit="rad",
+                role=SignalRole.CARRIER,
+            ),
+        ),
+        (
+            _signal(
+                identifier="sig_phase",
+                quantity="phase",
+                unit="deg",
+                role=SignalRole.CARRIER,
+            ),
+        ),
+    ],
+)
+def test_numerical_channel_declares_single_phase_carrier(
+    signals: tuple[SignalDeclaration, ...],
+) -> None:
+    """Numerical-only channels declare exactly one phase carrier in radians."""
+    with pytest.raises(DiagnosticPlanError, match="numerical-only"):
+        dataclasses.replace(channel_oscillator(), signals=signals)
+
+
+@pytest.mark.parametrize("field", ["source_identifier", "target_identifier"])
+def test_transformation_rejects_malformed_identifier(field: str) -> None:
+    """Malformed frame identifiers are rejected."""
+    with pytest.raises(DiagnosticPlanError, match=rf"transformation\.{field}"):
+        _transformation(**{field: "Frame!"})
+
+
+def test_transformation_rejects_self_mapping() -> None:
+    """A frame cannot be transformed to itself."""
+    with pytest.raises(DiagnosticPlanError, match="to itself"):
+        _transformation(target_identifier="frm_axial")
+
+
+@pytest.mark.parametrize(
+    ("kind", "dependent"),
+    [
+        (TransformationKind.FLUX_MAPPING, False),
+        (TransformationKind.RIGID, True),
+        (TransformationKind.PROJECTION, True),
+    ],
+)
+def test_transformation_rejects_equilibrium_flag_mismatch(
+    kind: TransformationKind, dependent: bool
+) -> None:
+    """Only flux mappings depend on an equilibrium reconstruction."""
+    with pytest.raises(DiagnosticPlanError, match="equilibrium_dependent"):
+        _transformation(kind=kind, equilibrium_dependent=dependent)
+
+
+def test_transformation_rejects_empty_method() -> None:
+    """An empty method statement is rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"transformation\.method"):
+        _transformation(method="")
+
+
+def test_transformation_rejects_claimed_evidence() -> None:
+    """No mapping evidence may be claimed."""
+    with pytest.raises(DiagnosticPlanError, match="evidence_claimed"):
+        _transformation(evidence_claimed=True)
+
+
+def test_domain_rejects_malformed_identifiers() -> None:
+    """Malformed domain and root identifiers are rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"domain\.identifier"):
+        ClockDomain(
+            identifier="Dom!",
+            root_clock_identifier="clk_facility",
+            member_clock_identifiers=("clk_facility",),
+            scope="x",
+        )
+    with pytest.raises(
+        DiagnosticPlanError, match=r"domain\.root_clock_identifier: malformed"
+    ):
+        ClockDomain(
+            identifier="dom",
+            root_clock_identifier="Clk!",
+            member_clock_identifiers=("clk_facility",),
+            scope="x",
+        )
+
+
+@pytest.mark.parametrize(
+    ("members", "message"),
+    [
+        ((), "at least one clock"),
+        (("clk_shot", "clk_facility"), "unique and sorted"),
+        (("clk_facility", "clk_facility"), "unique and sorted"),
+        (("clk_shot",), "root must be a member"),
+    ],
+)
+def test_domain_rejects_bad_membership(members: tuple[str, ...], message: str) -> None:
+    """Domain membership is unique, sorted, non-empty, and includes the root."""
+    with pytest.raises(DiagnosticPlanError, match=message):
+        ClockDomain(
+            identifier="dom",
+            root_clock_identifier="clk_facility",
+            member_clock_identifiers=members,
+            scope="x",
+        )
+
+
+def test_domain_rejects_empty_scope() -> None:
+    """An empty scope statement is rejected."""
+    with pytest.raises(DiagnosticPlanError, match=r"domain\.scope"):
+        ClockDomain(
+            identifier="dom",
+            root_clock_identifier="clk_facility",
+            member_clock_identifiers=("clk_facility",),
+            scope="",
+        )
+
+
+def test_topology_rejects_empty_unsorted_or_unknown_reference() -> None:
+    """A topology declares sorted domains and a declared reference domain."""
+    domain = CLOCK_TOPOLOGY.domains[0]
+    with pytest.raises(DiagnosticPlanError, match="at least one domain"):
+        ClockTopology(domains=(), reference_domain_identifier="dom_facility")
+    with pytest.raises(DiagnosticPlanError, match="unique and sorted"):
+        ClockTopology(
+            domains=(domain, domain), reference_domain_identifier="dom_facility"
+        )
+    with pytest.raises(DiagnosticPlanError, match="reference_domain_identifier"):
+        ClockTopology(domains=(domain,), reference_domain_identifier="dom_zz")
+
+
+def test_plan_rejects_domain_with_undeclared_clock() -> None:
+    """Domain members must be declared clocks."""
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_facility",
+        member_clock_identifiers=("clk_facility", "clk_shot", "clk_zz"),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="is not declared"):
+        _plan_with(clock_topology=_topology(domain))
+
+
+def test_plan_rejects_simulation_clock_in_domain() -> None:
+    """The simulation clock belongs to no physical domain."""
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_facility",
+        member_clock_identifiers=("clk_facility", "clk_shot", "clk_sim"),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="no physical domain"):
+        _plan_with(clock_topology=_topology(domain))
+
+
+def test_plan_rejects_clock_in_two_domains() -> None:
+    """Each physical clock belongs to exactly one domain."""
+    first = CLOCK_TOPOLOGY.domains[0]
+    second = ClockDomain(
+        identifier="dom_second",
+        root_clock_identifier="clk_shot",
+        member_clock_identifiers=("clk_shot",),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="more than one domain"):
+        _plan_with(clock_topology=_topology(first, second))
+
+
+def test_plan_rejects_domain_root_of_wrong_kind() -> None:
+    """A domain containing a facility clock is rooted at a facility clock."""
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_shot",
+        member_clock_identifiers=("clk_facility", "clk_shot"),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="root must be of kind"):
+        _plan_with(clock_topology=_topology(domain))
+
+
+def test_plan_rejects_unassigned_physical_clock() -> None:
+    """Every physical clock belongs to a domain."""
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_facility",
+        member_clock_identifiers=("clk_facility",),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="belong to no domain"):
+        _plan_with(clock_topology=_topology(domain))
+
+
+def test_plan_requires_member_relation_to_domain_root() -> None:
+    """Each non-root member declares a relation to its domain root."""
+    plan = synthetic_plan()
+    clocks = tuple(
+        sorted((*plan.clocks, _second_facility()), key=lambda clock: clock.identifier)
+    )
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_facility",
+        member_clock_identifiers=("clk_facility", "clk_facility_b", "clk_shot"),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="relation to its domain root"):
+        _plan_with(clocks=clocks, clock_topology=_topology(domain))
+
+
+def test_plan_requires_cross_domain_relation_to_reference_root() -> None:
+    """Every non-reference domain root declares a relation to the reference root."""
+    plan = synthetic_plan()
+    clocks = tuple(
+        sorted((*plan.clocks, _second_facility()), key=lambda clock: clock.identifier)
+    )
+    with pytest.raises(DiagnosticPlanError, match="reference root"):
+        _plan_with(clocks=clocks, clock_topology=_two_domain_topology())
+    accepted = _plan_with(
+        clocks=clocks,
+        clock_relations=tuple(
+            sorted(
+                (*plan.clock_relations, _relation("clk_facility_b", "clk_facility")),
+                key=lambda relation: (
+                    relation.child_identifier,
+                    relation.parent_identifier,
+                ),
+            )
+        ),
+        clock_topology=_two_domain_topology(),
+    )
+    assert accepted.clock_topology.reference_domain_identifier == "dom_facility"
+
+
+def test_plan_rejects_relation_cycle() -> None:
+    """Clock relations must not form a cycle."""
+    plan = synthetic_plan()
+    clocks = tuple(
+        sorted((*plan.clocks, _second_facility()), key=lambda clock: clock.identifier)
+    )
+    domain = ClockDomain(
+        identifier="dom_facility",
+        root_clock_identifier="clk_facility",
+        member_clock_identifiers=("clk_facility", "clk_facility_b", "clk_shot"),
+        scope="x",
+    )
+    with pytest.raises(DiagnosticPlanError, match="cycle"):
+        _plan_with(
+            clocks=clocks,
+            clock_relations=tuple(
+                sorted(
+                    (
+                        *plan.clock_relations,
+                        _relation("clk_facility_b", "clk_facility"),
+                        _relation("clk_facility", "clk_facility_b"),
+                    ),
+                    key=lambda relation: (
+                        relation.child_identifier,
+                        relation.parent_identifier,
+                    ),
+                )
+            ),
+            clock_topology=_topology(domain),
+        )
+
+
+def test_record_round_trips_signals_transformations_and_topology() -> None:
+    """The record carries the depth sections and parses back exactly."""
+    record = synthetic_plan().to_record()
+    assert any(
+        signal["role"] == "carrier" for signal in record["channels"][0]["signals"]
+    )
+    assert record["clock_topology"]["reference_domain_identifier"] == "dom_facility"
+    assert plan_from_record(record) == synthetic_plan()
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (lambda r: r["channels"][0].__setitem__("signals", {}), "must be an array"),
+        (lambda r: r["channels"][0]["signals"].__setitem__(0, 1), "must be an object"),
+        (
+            lambda r: r["channels"][0]["signals"][0].__setitem__("zz", 1),
+            "unknown members",
+        ),
+        (
+            lambda r: r["channels"][0]["signals"][0].__setitem__("role", "lead"),
+            "is not one of",
+        ),
+        (lambda r: r.__setitem__("frame_transformations", {}), "must be an array"),
+        (lambda r: r["frame_transformations"].__setitem__(0, 1), "must be an object"),
+        (
+            lambda r: r["frame_transformations"][0].__setitem__("zz", 1),
+            "unknown members",
+        ),
+        (lambda r: r.__setitem__("clock_topology", []), "must be an object"),
+        (lambda r: r["clock_topology"].__setitem__("zz", 1), "unknown members"),
+        (lambda r: r["clock_topology"].__setitem__("domains", {}), "must be an array"),
+        (
+            lambda r: r["clock_topology"]["domains"].__setitem__(0, 1),
+            "must be an object",
+        ),
+        (
+            lambda r: r["clock_topology"]["domains"][0].__setitem__("zz", 1),
+            "unknown members",
+        ),
+        (
+            lambda r: r["clock_topology"]["domains"][0].__setitem__(
+                "member_clock_identifiers", "x"
+            ),
+            "must be an array",
+        ),
+        (
+            lambda r: r["clock_topology"]["domains"][0].__setitem__(
+                "member_clock_identifiers", [1]
+            ),
+            "entries must be strings",
+        ),
+    ],
+)
+def test_parser_rejects_malformed_depth_sections(mutate: Any, message: str) -> None:
+    """Every depth section is parsed with exact keys and strict types."""
+    record = synthetic_plan().to_record()
+    mutate(record)
+    with pytest.raises(DiagnosticPlanError, match=message):
+        plan_from_record(record)
+
+
+def test_parser_rejects_pre_depth_record_shape() -> None:
+    """A record without the depth sections is refused, fail closed."""
+    record = synthetic_plan().to_record()
+    del record["frame_transformations"]
+    del record["clock_topology"]
+    with pytest.raises(DiagnosticPlanError, match="must be an array"):
+        plan_from_record(record)
+    record = synthetic_plan().to_record()
+    for channel in record["channels"]:
+        del channel["signals"]
+    with pytest.raises(DiagnosticPlanError, match="must be an array"):
+        plan_from_record(record)
+
+
+def test_plan_rejects_unsorted_transformations() -> None:
+    """Transformations must be sorted by source then target."""
+    plan = synthetic_plan()
+    with pytest.raises(DiagnosticPlanError, match="must be sorted"):
+        _plan_with(
+            frames=tuple(
+                sorted(
+                    (*plan.frames, _extra_frame("frm_zz_extra")),
+                    key=lambda frame: frame.identifier,
+                )
+            ),
+            frame_transformations=(
+                _transformation(
+                    source_identifier="frm_field_line",
+                    target_identifier="frm_zz_extra",
+                    kind=TransformationKind.FLUX_MAPPING,
+                    equilibrium_dependent=True,
+                ),
+                _transformation(),
+            ),
+        )
+
+
+def test_plan_rejects_duplicate_transformation_pair() -> None:
+    """At most one transformation per unordered frame pair."""
+    with pytest.raises(DiagnosticPlanError, match="duplicate transformation pair"):
+        _plan_with(
+            frame_transformations=(
+                _transformation(),
+                _transformation(
+                    source_identifier="frm_field_line", target_identifier="frm_axial"
+                ),
+            )
+        )
+
+
+def test_plan_rejects_transformation_to_undeclared_frame() -> None:
+    """Transformations reference declared frames only."""
+    with pytest.raises(DiagnosticPlanError, match="is not declared"):
+        _plan_with(
+            frame_transformations=tuple(
+                sorted(
+                    (
+                        *synthetic_plan().frame_transformations,
+                        _transformation(target_identifier="frm_zz_ghost"),
+                    ),
+                    key=lambda item: (item.source_identifier, item.target_identifier),
+                )
+            )
+        )
+
+
+def test_plan_rejects_inadmissible_transformation_kind() -> None:
+    """The kind must be admissible for the two frame kinds."""
+    wrong = _transformation(kind=TransformationKind.RIGID, equilibrium_dependent=False)
+    with pytest.raises(DiagnosticPlanError, match="not admissible"):
+        _plan_with(
+            frame_transformations=tuple(
+                wrong
+                if (item.source_identifier, item.target_identifier)
+                == ("frm_axial", "frm_field_line")
+                else item
+                for item in synthetic_plan().frame_transformations
+            )
+        )
+
+
+def test_plan_requires_connected_frames() -> None:
+    """With two or more frames, the transformations must connect them all."""
+    with pytest.raises(DiagnosticPlanError, match="not connected"):
+        _plan_with(frame_transformations=())
+
+
+def test_single_frame_plan_needs_no_transformation() -> None:
+    """A single-frame plan carries an empty transformation tuple."""
+    plan = synthetic_plan()
+    referenced = {
+        channel.evidence_bindings.get("coordinate_frame") for channel in plan.channels
+    } - {None}
+    kept = (
+        tuple(frame for frame in plan.frames if frame.identifier in referenced)[:1]
+        or plan.frames[:1]
+    )
+    channels = tuple(
+        dataclasses.replace(
+            channel,
+            evidence_bindings={
+                **channel.evidence_bindings,
+                **(
+                    {"coordinate_frame": kept[0].identifier}
+                    if "coordinate_frame" in channel.evidence_bindings
+                    else {}
+                ),
+            },
+        )
+        for channel in plan.channels
+    )
+    variant = _plan_with(frames=kept, frame_transformations=(), channels=channels)
+    assert variant.frame_transformations == ()
+
+
+def test_report_flags_cyclic_array_without_amplitude_signal() -> None:
+    """A multi-element cyclic array without an amplitude signal draws the advisory."""
+    channel = _derived(
+        signals=tuple(
+            signal
+            for signal in SIGNALS_CH_FLUTE_PROBE_ARRAY
+            if signal.role is not SignalRole.AMPLITUDE
+        )
+    )
+    plan = _plan_with(
+        channels=tuple(
+            channel if entry.identifier == channel.identifier else entry
+            for entry in synthetic_plan().channels
+        )
+    )
+    findings = plan.consistency_report()
+    assert len(findings) == 1
+    assert "amplitude" in findings[0].message
 
 
 def test_channel_rejects_malformed_identifier() -> None:
@@ -535,6 +1292,7 @@ def test_direct_channel_rejects_cyclic_zero_band() -> None:
             acquisition_duration_s=5.0,
             element_count=1,
             evidence_bindings=dict(DIRECT_BINDINGS),
+            signals=SIGNALS_CH_DRIVE_REFERENCE,
             synthetic=True,
         )
 
@@ -615,6 +1373,8 @@ def test_plan_accepts_explicit_deferral() -> None:
         clocks=(clock_facility(), clock_shot()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel_drive_reference(),
@@ -640,6 +1400,8 @@ def test_plan_rejects_malformed_identifier() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -665,6 +1427,8 @@ def test_plan_rejects_foreign_binding() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -685,6 +1449,8 @@ def test_plan_rejects_unsorted_clocks() -> None:
             clocks=(clock_shot(), clock_facility(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -705,6 +1471,8 @@ def test_plan_rejects_unsorted_channels() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_drive_reference(),
                 channel_diamagnetic(),
@@ -729,6 +1497,8 @@ def test_plan_rejects_duplicate_deferrals() -> None:
             clocks=(clock_facility(), clock_shot()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -748,6 +1518,8 @@ def test_plan_rejects_undeclared_clock() -> None:
             clocks=(clock_facility(), clock_shot()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -771,6 +1543,8 @@ def test_plan_rejects_incompatible_clock_kind() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -791,6 +1565,8 @@ def test_plan_rejects_planned_and_deferred_overlap() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -816,6 +1592,8 @@ def test_plan_rejects_incomplete_coverage() -> None:
             clocks=(clock_facility(), clock_shot(), clock_simulation()),
             frames=REFERENCE_FRAMES,
             clock_relations=CLOCK_RELATIONS,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=(
                 channel_diamagnetic(),
                 channel_drive_reference(),
@@ -835,6 +1613,8 @@ def test_report_flags_band_outside_typical_range() -> None:
         clocks=(clock_facility(), clock_shot(), clock_simulation()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel_drive_reference(),
@@ -863,6 +1643,7 @@ def test_report_flags_drive_outside_heating_range() -> None:
         acquisition_duration_s=5.0,
         element_count=1,
         evidence_bindings=dict(DIRECT_BINDINGS),
+        signals=SIGNALS_CH_DRIVE_REFERENCE,
         synthetic=True,
     )
     plan = DiagnosticPlan(
@@ -871,6 +1652,8 @@ def test_report_flags_drive_outside_heating_range() -> None:
         clocks=(clock_facility(), clock_shot(), clock_simulation()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel,
@@ -900,6 +1683,8 @@ def test_report_flags_clock_coarser_than_sampling() -> None:
         clocks=(clock_facility(), clock, clock_simulation()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel_drive_reference(),
@@ -921,6 +1706,8 @@ def test_round_trip_preserves_deferrals() -> None:
         clocks=(clock_facility(), clock_shot()),
         frames=REFERENCE_FRAMES,
         clock_relations=CLOCK_RELATIONS,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=(
             channel_diamagnetic(),
             channel_drive_reference(),
@@ -1159,6 +1946,8 @@ def test_plan_rejects_undeclared_relation_clock() -> None:
             clocks=plan.clocks,
             frames=plan.frames,
             clock_relations=(*plan.clock_relations, relation),
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )
@@ -1183,6 +1972,8 @@ def test_plan_rejects_simulation_clock_relation() -> None:
             clocks=plan.clocks,
             frames=plan.frames,
             clock_relations=(*plan.clock_relations, relation),
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )
@@ -1198,6 +1989,8 @@ def test_plan_requires_epoch_to_facility_bound() -> None:
             clocks=plan.clocks,
             frames=plan.frames,
             clock_relations=(),
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )
@@ -1213,6 +2006,8 @@ def test_plan_rejects_duplicate_frames() -> None:
             clocks=plan.clocks,
             frames=(*plan.frames, plan.frames[0]),
             clock_relations=plan.clock_relations,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )
@@ -1229,6 +2024,8 @@ def test_plan_rejects_unknown_frame_reference() -> None:
             clocks=plan.clocks,
             frames=kept,
             clock_relations=plan.clock_relations,
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )
@@ -1265,6 +2062,8 @@ def test_report_flags_window_beyond_device_ceiling() -> None:
         clocks=plan.clocks,
         frames=plan.frames,
         clock_relations=plan.clock_relations,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=tuple(
             channel if entry.identifier == channel.identifier else entry
             for entry in plan.channels
@@ -1286,6 +2085,8 @@ def test_report_flags_array_size_outside_common_range() -> None:
         clocks=plan.clocks,
         frames=plan.frames,
         clock_relations=plan.clock_relations,
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=CLOCK_TOPOLOGY,
         channels=tuple(
             channel if entry.identifier == channel.identifier else entry
             for entry in plan.channels
@@ -1376,6 +2177,8 @@ def test_plan_without_facility_clock_needs_no_relation() -> None:
         clocks=clocks,
         frames=plan.frames,
         clock_relations=(),
+        frame_transformations=REFERENCE_TRANSFORMATIONS,
+        clock_topology=SHOT_ONLY_TOPOLOGY,
         channels=channels,
         deferrals=deferrals,
     )
@@ -1428,6 +2231,8 @@ def test_plan_rejects_duplicate_relations() -> None:
             clocks=plan.clocks,
             frames=plan.frames,
             clock_relations=(*plan.clock_relations, plan.clock_relations[0]),
+            frame_transformations=REFERENCE_TRANSFORMATIONS,
+            clock_topology=CLOCK_TOPOLOGY,
             channels=plan.channels,
             deferrals=plan.deferrals,
         )

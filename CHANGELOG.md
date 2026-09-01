@@ -12,6 +12,17 @@ SCPN Mirror Core — CHANGELOG
 
 ## [Unreleased]
 
+### Added
+
+- Diagnostic-plan depth: per-channel signal inventories, frame
+  transformations with a fixed kind-admissibility table and connectivity
+  rule, and a clock topology partitioning the physical clocks into rooted
+  domains with a star of relations to the reference root. Envelope
+  `scpn.reactor-diagnostic-plan-envelope.v1` bumped to `1.2.0`; the
+  fixture is regenerated from the public surface and re-pinned. All new
+  members are declarations: no observation, phase, mapping, or control
+  authority is created.
+
 ### Fixed
 
 - Added the nullable `timing_uncertainty_s` channel member (always `null`;
