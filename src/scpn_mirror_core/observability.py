@@ -571,6 +571,9 @@ class DiagnosticChannelPlan:
         Highest signal frequency of interest; finite, non-negative, and
         positive for cyclic classes, where the Nyquist criterion
         ``sample_rate_hz >= 2 * max_signal_frequency_hz`` is enforced.
+    timing_uncertainty_s
+        Event-timing uncertainty; must be ``None``: no event-relative
+        candidate is applicable to SCPN-MIRROR-CORE.
     acquisition_start_s
         Acquisition window start relative to the bound clock's epoch;
         finite (negative means pre-trigger).
@@ -597,6 +600,7 @@ class DiagnosticChannelPlan:
     clock_identifier: str
     sample_rate_hz: float
     max_signal_frequency_hz: float
+    timing_uncertainty_s: float | None
     acquisition_start_s: float
     acquisition_duration_s: float
     element_count: int
@@ -657,6 +661,11 @@ class DiagnosticChannelPlan:
                     f"{self.sample_rate_hz!r} Hz cannot resolve "
                     f"{self.max_signal_frequency_hz!r} Hz"
                 )
+        if self.timing_uncertainty_s is not None:
+            raise DiagnosticPlanError(
+                "channel.timing_uncertainty_s: only event-relative channels "
+                "declare a timing uncertainty"
+            )
         if not math.isfinite(self.acquisition_start_s):
             raise DiagnosticPlanError(
                 "channel.acquisition_start_s: must be finite, "
@@ -1025,6 +1034,7 @@ class DiagnosticPlan:
                     "clock_identifier": channel.clock_identifier,
                     "sample_rate_hz": channel.sample_rate_hz,
                     "max_signal_frequency_hz": channel.max_signal_frequency_hz,
+                    "timing_uncertainty_s": channel.timing_uncertainty_s,
                     "acquisition_start_s": channel.acquisition_start_s,
                     "acquisition_duration_s": (channel.acquisition_duration_s),
                     "element_count": channel.element_count,
@@ -1167,6 +1177,38 @@ def _number(record: dict[str, Any], field: str) -> float:
     value = record.get(field)
     if isinstance(value, bool) or not isinstance(value, int | float):
         raise DiagnosticPlanError(f"{field}: must be a number, got {value!r}")
+    return float(value)
+
+
+def _optional_number(record: dict[str, Any], field: str) -> float | None:
+    """Return one nullable real-number field of a record.
+
+    Parameters
+    ----------
+    record
+        Mapping under inspection.
+    field
+        Key that must hold a real number or ``None``.
+
+    Returns
+    -------
+    float or None
+        The numeric value, or ``None``; booleans are rejected.
+
+    Raises
+    ------
+    DiagnosticPlanError
+        If the field holds anything else.
+    """
+    value = record.get(field)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise DiagnosticPlanError(f"{field}: must be a number or null, got {value!r}")
+    if not math.isfinite(value):
+        raise DiagnosticPlanError(
+            f"{field}: must be a finite number or null, got {value!r}"
+        )
     return float(value)
 
 
@@ -1372,6 +1414,7 @@ _CHANNEL_KEYS: Final = frozenset(
         "clock_identifier",
         "sample_rate_hz",
         "max_signal_frequency_hz",
+        "timing_uncertainty_s",
         "acquisition_start_s",
         "acquisition_duration_s",
         "element_count",
@@ -1455,6 +1498,7 @@ def plan_from_record(record: Any) -> DiagnosticPlan:
                 clock_identifier=_string(entry, "clock_identifier"),
                 sample_rate_hz=_number(entry, "sample_rate_hz"),
                 max_signal_frequency_hz=_number(entry, "max_signal_frequency_hz"),
+                timing_uncertainty_s=_optional_number(entry, "timing_uncertainty_s"),
                 acquisition_start_s=_number(entry, "acquisition_start_s"),
                 acquisition_duration_s=_number(entry, "acquisition_duration_s"),
                 element_count=_integer(entry, "element_count"),

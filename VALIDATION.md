@@ -107,6 +107,10 @@ Evidence record of the `diagnostic_clock_semantics` capability
 
 What is exercised, all under the 100 % statement-and-branch coverage gate:
 
+- The nullable `timing_uncertainty_s` member, declared `null` on every
+  channel because no event-relative candidate is applicable here; a
+  non-null value is refused. This keeps the channel shape identical across
+  the portfolio under envelope 1.1.0.
 - Validated frozen declaration objects (`ClockModel`,
   `DiagnosticChannelPlan`, `DeferredCandidate`, `DiagnosticPlan`)
   rejecting catalogue misalignment: inapplicable candidates,

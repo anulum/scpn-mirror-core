@@ -42,7 +42,7 @@ from scpn_mirror_core.plan_envelope import (
 )
 
 FIXTURE = Path(__file__).parent / "data" / "plan_envelope_fixture.json"
-FIXTURE_SHA256 = "0b74b090ac6194174920bda0a455c2571287eff917475cfaf0fbac70a3c70009"
+FIXTURE_SHA256 = "257cedfee5f7b061ea6b8368e46d1b229bac8dc24f1391d88315462bc4457ba6"
 
 
 def fixture_document() -> dict[str, Any]:

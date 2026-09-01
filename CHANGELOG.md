@@ -12,6 +12,13 @@ SCPN Mirror Core — CHANGELOG
 
 ## [Unreleased]
 
+### Fixed
+
+- Added the nullable `timing_uncertainty_s` channel member (always `null`;
+  no event-relative candidate is applicable) so the diagnostic-plan
+  channel shape matches the portfolio-uniform envelope 1.1.0 contract;
+  fixture regenerated and re-pinned.
+
 ### Added
 
 - Local gate parity with the wider ecosystem: the pre-commit chain now
