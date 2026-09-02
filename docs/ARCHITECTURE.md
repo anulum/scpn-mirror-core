@@ -84,7 +84,11 @@ SCPN-CONTROL ──admitted ControlAction──► independent machine protectio
 |---|---|
 | `reactor-domain.json` | portable source of project identity and contracts |
 | `studio/portfolio-descriptor.json` | derived Studio descriptor, `not_federated` |
-| `capability-inventory.json` | generated, truthfully empty inventory |
+| `capability-inventory.json` | generated inventory of the three implemented capabilities |
+| `src/scpn_mirror_core/physics/` | level-0 device physics (published mirror scalings and closed forms, composed record) |
+| `reactor-domain.json` → `kernel_library` | exact pin of `scpn-reactor-kernels` (commit object, kernel-inventory digest, consumed kernel; ADR 0006) |
+| `rust/` | optional native kernels (`scpn-mirror-rs`, depending on the library's Rust crate at the pinned commit), bit-exact with the Python floor |
+| `benchmarks/` | standard-conformant benchmark and committed local artefact |
 | `docs/CONTROL_ADAPTER_SPECIFICATION.md` | device-owned adapter contract |
 | `docs/THREAT_MODEL.md` | assets, trust boundaries, misuse paths |
 | `docs/adr/0001-repository-boundary.md` | boundary decision record |

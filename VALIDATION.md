@@ -100,6 +100,100 @@ Bounded claims — what is NOT claimed:
   or stability results; no benchmark, dataset, solver, controller, or
   experimental correlation exists in this repository.
 
+## Level-0 device physics
+
+Evidence record of the `level0_device_physics` capability
+(`computational_prototype`; design records:
+`docs/adr/0005-level0-device-physics.md` and
+`docs/adr/0006-shared-numerics-kernels.md`). Sources (both CC BY 4.0):
+D. Endrizzi et al., "Physics basis for the Wisconsin HTS Axisymmetric
+Mirror (WHAM)", J. Plasma Phys. 89 (2023) 975890501; S. Frank et al.,
+"Confinement performance predictions for a high field axisymmetric tandem
+mirror", J. Plasma Phys. 91 (2025) E110.
+
+What is exercised, all under the 100 % statement-and-branch coverage gate
+(`src/scpn_mirror_core/physics/`):
+
+- **Numerics substrate** (`numerics.py`): the natural logarithm, the
+  exponential and the real power are the pinned shared kernel library's
+  (`scpn-reactor-kernels`, kernel `numerics_transcendental`; commit and
+  inventory digest in `reactor-domain.json`, `kernel_library`); tests
+  prove each wrapper returns the library value bit for bit and re-raises
+  the library's domain refusal as `NumericsError` (a configuration error).
+  The manifest block is validated field by field and a contract test
+  proves the manifest, the `pyproject.toml` dependency, the installed
+  library version, `rust/Cargo.toml`, `rust/Cargo.lock` and the CI install
+  steps name one commit.
+- **Mirror ratio and loss boundary** (`mirror.py`; Endrizzi eq. 3.6,
+  Frank eqs. 2.3–2.5): `R_m = R_vac / sqrt(1 - beta)` with beta refused
+  outside `[0, 1)`; the loss boundary `sin^2 theta = (1 + q Delta phi / E)
+  / R_m` for ions and electrons, with the electrons fully confined below
+  `e Delta phi` (the source: "only electrons with energies above 5 T_e
+  leave") and a cone at or beyond unity reported as "no trapped region";
+  at zero potential the isotropic fraction equals the configuration's
+  `loss_cone_fraction()` bit for bit. The typography of the printed
+  eq. 2.5b is resolved by the source's own statement (ADR 0005 item 3).
+- **Collisional time scales** (`collisions.py`; eqs. 3.1–3.3): the
+  engineering forms at unit inputs (5 ms, 1/8 ms, 5.8 μs), the stated
+  scalings, and the source's identity `tau_s = tau_ii` at
+  `T_e = E_i / 40^(2/3)` (reproduced to `1e-14` relative; the source says
+  "about `E_i / 10`", and the value lies between `E_i / 12` and `E_i / 10`).
+- **Confinement scalings** (`confinement.py`; eqs. 3.4–3.5): the classical
+  scaling equals 250 ms at the reference point (n20 = 1, 100 keV,
+  `R_m = 10`); the source's statement that beta from 0 to 0.9 gains "only
+  50 %" is reproduced exactly (factor 1.5 at `R_vac = 10`); the gas-dynamic
+  dimensional form `R_m L_p / c_s` with `c_s = sqrt(T_e / m_i)` reproduces
+  the printed coefficient 5.2 within 3 % at 2.5 proton masses (5.09); the
+  regime disposition follows the configuration's declaration.
+- **FLR criterion** (`stability.py`; eq. 3.7): the source's worked case
+  `a / rho_i = 4`, `L_p / a = 10` gives `m_crit = 0.8` ("all m >= 2 FLR
+  stabilised"); the disposition switches at 2; the gyromotion definitions
+  are tested as declared. The `m = 1` mode is not assessed.
+- **Adiabaticity** (`adiabaticity.py`; §3.6): `alpha = L_B / rho_par`,
+  its `B` and `1/f` scalings, the threshold 10, and the not-applicable
+  report at zero parallel fraction. No printed numerical anchor exists
+  (the source's `alpha ~ 10` case does not print `L_B`).
+- **Tandem confinement** (`tandem.py`; Frank eqs. 3.2–3.7, 4.3):
+  `phi_i = T_e ln(n_p / n_c)` refusing `n_p <= n_c`; `G(1) = sqrt 2
+  ln(3 + 2 sqrt 2)` and monotony of `G`; `tau_ii` at `T_ic`; the
+  combination identity of eq. 3.2 and `tau_c` below both channels; the
+  ambipolar-hole energy absent when `R_m sin^2 theta <= 1`; an exponential
+  outside the library's window refused as `NumericsError`. No printed
+  numerical anchor exists for eq. 3.3; the record's digest is pinned as
+  an immutability fixture.
+- A composed `Level0PhysicsRecord` (`scpn.mirror-level0-physics.v1`
+  `1.0.0`) with canonical bytes, SHA-256 digest, fixed non-claims and two
+  pinned reference digests (simple and tandem), built from the validated
+  configuration and explicit `ModelInputs` / `TandemInputs` (required
+  exactly for a tandem); every input rejects non-positive and non-finite
+  values.
+- **Native parity**: the Rust crate in `rust/` mirrors every kernel with
+  identical operation order on the library's Rust crate at the pinned
+  commit; `tests/test_physics_native_parity.py` compares float64 bit
+  patterns over a 72-point grid of models 1–3 plus the FLR, adiabaticity
+  (including the not-applicable branch) and tandem (including the absent
+  hole energy) inputs, and the refusal paths of the bindings.
+- **Benchmark**: `benchmarks/level0_physics.py` per the ecosystem
+  benchmark standard; results in `docs/benchmarks.md` and the committed
+  local artefact `benchmarks/results/level0_physics.local.json`.
+
+Bounded claims — what is NOT claimed:
+
+- Every number is a closed-form evaluation of published scalings and closed
+  forms on a synthetic configuration; no Fokker–Planck, ambipolar,
+  equilibrium or stability equation is solved, and no eigenvalue problem
+  exists here.
+- The anchors reproduce numbers and statements printed in the sources;
+  they are not correlations with experimental data; the printed
+  coefficient of the gas-dynamic time is matched only to the stated 3 %.
+- No fusion power, gain, breakeven, reactivity or `m = 1` stability
+  statement is made; the plug electron potential and the field-gradient
+  scale length are declared inputs, not results.
+- No value describes, approximates or validates any real machine; the
+  benchmark measures per-point evaluation cost of two implementations of
+  the same closed forms, not physics.
+- Maturity stays `computational_prototype`.
+
 ## Diagnostic and clock semantics
 
 Evidence record of the `diagnostic_clock_semantics` capability

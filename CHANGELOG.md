@@ -14,6 +14,34 @@ SCPN Mirror Core — CHANGELOG
 
 ### Added
 
+- Level-0 device physics (`src/scpn_mirror_core/physics/`), the third
+  implemented capability at `computational_prototype` (ADR 0005): the
+  diamagnetic mirror ratio and the potential-modified loss boundary, the
+  collisional time scales, the classical and gas-dynamic confinement
+  scalings with the regime disposition, the FLR interchange criterion,
+  the fast-ion adiabaticity parameter and, for a tandem mirror, the
+  Pastukhov confinement chain with the ambipolar-hole energy — with a
+  canonical `Level0PhysicsRecord`, explicit `ModelInputs` and
+  `TandemInputs`, and two pinned reference digests. The transcendental
+  functions are the shared kernel library's (`scpn-reactor-kernels`,
+  ADR 0006): the library is the one runtime dependency pinned to a commit
+  object in `pyproject.toml`, the manifest records the same commit, the
+  library's kernel-inventory digest and the consumed kernel in a new
+  optional `kernel_library` block enforced by the validator, and declares
+  the excluded domain `shared_physics_geometry_and_numerics_kernels`.
+  Native kernels (`rust/`, crate `scpn-mirror-rs` depending on the
+  library's Rust crate at the same commit, optional distribution
+  `scpn-mirror-native`) reproduce every value bit for bit, proven by
+  parity tests; a standard-conformant benchmark
+  (`benchmarks/level0_physics.py`) with a committed local artefact and
+  `docs/benchmarks.md`. The manifest declares the capability and the
+  owned domain `analytic_device_physics_models`; descriptor and inventory
+  regenerated; the envelope fixture regenerated for the new
+  `manifest_sha256` (plan bytes unchanged). Gates extended: `mypy` scope
+  includes `benchmarks/` (and `make typecheck` now covers `src/`), CI
+  installs the package with its pinned dependency, a `rust` CI job runs
+  the crate gates, parity and a benchmark smoke, `make rust` locally.
+
 - Diagnostic-plan depth: per-channel signal inventories, frame
   transformations with a fixed kind-admissibility table and connectivity
   rule, and a clock topology partitioning the physical clocks into rooted

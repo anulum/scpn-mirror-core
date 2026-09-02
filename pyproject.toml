@@ -17,6 +17,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "AGPL-3.0-or-later"
 dynamic = ["version"]
+# The shared kernel library is pinned to one commit object of its public
+# repository (no release exists yet); the same commit and the digest of its
+# kernel inventory are recorded in reactor-domain.json (kernel_library) and
+# a contract test proves the two pins agree.
+dependencies = [
+    "scpn-reactor-kernels @ git+https://github.com/anulum/scpn-reactor-kernels.git@6f574bfdddadf24c6a4c0a020c0a257fec38231a",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "scpn_mirror_core.__version__" }
@@ -58,6 +65,9 @@ select = [
 # preflight executes fixed argument vectors of repository gates without a
 # shell and without untrusted input (scope of S603/S607)
 "tools/preflight.py" = ["S603", "S607"]
+# the benchmark records the commit with a fixed git argument vector resolved
+# through shutil.which, without a shell and without untrusted input
+"benchmarks/level0_physics.py" = ["S603"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
@@ -71,6 +81,7 @@ known-first-party = [
     "derive_studio_descriptor",
     "generate_capability_inventory",
     "preflight",
+    "physics_fixtures",
 ]
 
 [tool.mypy]
@@ -78,7 +89,7 @@ strict = true
 python_version = "3.12"
 warn_unreachable = true
 pretty = true
-mypy_path = ["tools", "src"]
+mypy_path = ["tools", "src", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

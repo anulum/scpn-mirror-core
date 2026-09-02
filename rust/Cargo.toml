@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Commercial license available
+# © Concepts 1996–2026 Miroslav Šotek. All rights reserved.
+# © Code 2020–2026 Miroslav Šotek. All rights reserved.
+# ORCID: 0009-0009-3560-0851
+# Contact: www.anulum.li | protoscience@anulum.li
+# SCPN Mirror Core — native kernel crate manifest
+
+[package]
+name = "scpn-mirror-rs"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "AGPL-3.0-or-later"
+description = "Native level-0 device-physics kernels of SCPN Mirror Core, bit-exact with the Python floor"
+publish = false
+
+[lib]
+name = "scpn_mirror_native"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+python = ["dep:pyo3"]
+
+[dependencies]
+# The shared kernel library at the commit pinned in reactor-domain.json
+# (kernel_library.source_commit); its vendored logarithm, exponential and
+# power are the same series the Python floor evaluates.
+scpn-reactor-kernels-rs = { git = "https://github.com/anulum/scpn-reactor-kernels.git", rev = "6f574bfdddadf24c6a4c0a020c0a257fec38231a", default-features = false }
+pyo3 = { version = "0.29", features = ["extension-module"], optional = true }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

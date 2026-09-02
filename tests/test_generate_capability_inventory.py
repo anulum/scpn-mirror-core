@@ -32,6 +32,11 @@ CAPABILITIES = [
         "evidence_maturity": "computational_prototype",
         "evidence_pointer": "VALIDATION.md#diagnostic-and-clock-semantics",
     },
+    {
+        "identifier": "level0_device_physics",
+        "evidence_maturity": "computational_prototype",
+        "evidence_pointer": "VALIDATION.md#level-0-device-physics",
+    },
 ]
 
 
@@ -41,7 +46,7 @@ def test_inventory_reports_exact_capability_set() -> None:
     assert inventory["schema"] == "scpn.capability-inventory.v1"
     assert inventory["project"] == "SCPN-MIRROR-CORE"
     assert inventory["evidence_maturity"] == "computational_prototype"
-    assert inventory["implemented_capability_count"] == 2
+    assert inventory["implemented_capability_count"] == 3
     assert inventory["capabilities"] == CAPABILITIES
     assert inventory["claims"] == []
     assert inventory["source"]["manifest_sha256"] == sha256_of_file(MANIFEST)

@@ -11,6 +11,7 @@
 # stays uniform, and never run the checker with --write.
 
 [default.extend-words]
+thic = "thic"
 # Hyphenated prefix in hazard vocabulary: "mis-steer", "mis-set".
 mis = "mis"
 # Accepted alternative spelling used in the threat model prose.
