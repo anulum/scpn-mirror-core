@@ -139,6 +139,13 @@ SCPN Mirror Core — CHANGELOG
 
 ### Changed
 
+- Native surface documentation is now a compiler gate, not a habit: the crate
+  denies `missing_docs`, `missing_debug_implementations` and `unsafe_code`, and
+  denies rustdoc's broken and private intra-doc links and invalid Rust code
+  blocks. `cargo doc --no-deps` joins the local `rust` target and the hosted
+  `rust` job, so a public item that ships without documentation fails the build
+  rather than accumulating as debt for the next reader.
+
 - Studio portfolio descriptor schema ratified at version 1.1.0 after
   downstream review, before any consumer adoption (1.0.0 superseded
   unconsumed): canonical JSON Schema published in-repository with a strict
