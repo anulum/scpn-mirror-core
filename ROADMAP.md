@@ -57,6 +57,25 @@ this repository until it appears in the capability inventory with evidence.
   a curvature scale exists at level 2, and the plug electron potential
   solved at level 1.
 
+- **Device 3D model** (landed 2026-09-03) — the mechanical envelope of
+  the assembly (vessel, two coil pairs, expansion tanks, end walls) and
+  the ten analytic bodies derived from it, on the shared geometry kernels.
+  The plasma body is a **flux tube**, not a cylinder: its radius follows
+  the declared axial field by flux conservation, and the build refuses a
+  design whose column does not pass the mirror-coil bore. Canonical
+  record, aperture clearances, open-format exports, bit-exact native
+  parity and a standard-conformant benchmark; `computational_prototype`
+  (ADR 0007, `VALIDATION.md#device-3d-model`). Follow-ups under the same
+  capability: a resolved central-cell coil set once a field model exists
+  at level 1, and the biased limiter and end-ring hardware once they are
+  more than declarations.
+- **Device CAD model** (landed 2026-09-03) — the same ten bodies as exact
+  B-rep solids on the pinned OpenCASCADE kernel through the shared CAD
+  kernels, with per-body evidence against the analytic closed forms, a
+  deterministic normalised STEP export and an optional `cad` extra so the
+  back-end is never a condition of installing the package;
+  `computational_prototype` (ADR 0008, `VALIDATION.md#device-cad-model`).
+
 ## Planned (no implementation exists; ordering is not a commitment)
 1. **Safety-envelope declaration** — machine-readable operational envelope
    (coil, beam, potential, and end-tank bounds) consumed by the CONTROL

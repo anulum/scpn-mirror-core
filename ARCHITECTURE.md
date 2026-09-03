@@ -12,12 +12,16 @@ SCPN Mirror Core — Architecture summary
 
 `SCPN-MIRROR-CORE` is the device-family owner for magnetic-mirror systems
 (simple, tandem, and gas-dynamic mirrors) inside the SCPN Reactor Systems
-Research Group. The repository holds three implemented capabilities at
+Research Group. The repository holds five implemented capabilities at
 `computational_prototype` — the device configuration model (ADR 0002),
-the diagnostic and clock semantics model (ADR 0003) and the level-0
+the diagnostic and clock semantics model (ADR 0003), the level-0
 device physics (ADR 0005; published mirror scalings and closed forms on
 the pinned shared numerics kernels, ADR 0006, with optional native
-kernels in `rust/`), all in `src/scpn_mirror_core/` — alongside the
+kernels in `rust/`), the device 3D model (ADR 0007; ten analytic bodies
+whose plasma body is a flux tube derived from a declared axial field
+profile) and the device CAD model (ADR 0008; the same bodies as B-rep
+solids with a deterministic STEP export, on an optional CAD extra), all
+in `src/scpn_mirror_core/` — alongside the
 device boundary, its ecosystem contracts, and the validation tooling that
 enforces them.
 

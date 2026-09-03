@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-09-03T16:45:07.395104+00:00",
+  "label": "local",
+  "parameters": {
+    "repeats": 10,
+    "warmup": 2
+  },
+  "platform": {
+    "commit": "3d3d89060999523fd62c7651115fd94dfe79250f",
+    "cpu_model": "11th Gen Intel(R) Core(TM) i5-11600K @ 3.90GHz",
+    "isolated_cores": false,
+    "load_average_1min_at_start": "10.68",
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3"
+  },
+  "results": [
+    {
+      "backend": "cadquery_ocp",
+      "name": "brep_build_and_manifest",
+      "stats": {
+        "max_ms_per_operation": 88.214153,
+        "mean_ms_per_operation": 71.824635,
+        "min_ms_per_operation": 58.841376,
+        "p50_ms_per_operation": 64.655612,
+        "p95_ms_per_operation": 88.214153,
+        "p99_ms_per_operation": 88.214153
+      },
+      "status": "measured"
+    },
+    {
+      "backend": "cadquery_ocp",
+      "name": "step_export_normalised",
+      "stats": {
+        "max_ms_per_operation": 22.859662,
+        "mean_ms_per_operation": 17.7194961,
+        "min_ms_per_operation": 12.897275,
+        "p50_ms_per_operation": 17.012464,
+        "p95_ms_per_operation": 22.859662,
+        "p99_ms_per_operation": 22.859662
+      },
+      "status": "measured"
+    },
+    {
+      "backend": "cadquery_ocp",
+      "name": "facet_ten_bodies",
+      "stats": {
+        "max_ms_per_operation": 1192.872184,
+        "mean_ms_per_operation": 1075.1332311,
+        "min_ms_per_operation": 966.419961,
+        "p50_ms_per_operation": 1062.621746,
+        "p95_ms_per_operation": 1192.872184,
+        "p99_ms_per_operation": 1192.872184
+      },
+      "status": "measured"
+    },
+    {
+      "backend": "cadquery_ocp",
+      "name": "device_cad_record_build",
+      "stats": {
+        "max_ms_per_operation": 2704.917777,
+        "mean_ms_per_operation": 2391.8909675,
+        "min_ms_per_operation": 2009.806212,
+        "p50_ms_per_operation": 2434.329014,
+        "p95_ms_per_operation": 2704.917777,
+        "p99_ms_per_operation": 2704.917777
+      },
+      "status": "measured"
+    }
+  ],
+  "schema": "scpn-mirror-core.device-model-cad-benchmark.v1"
+}

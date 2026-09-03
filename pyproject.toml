@@ -22,8 +22,18 @@ dynamic = ["version"]
 # kernel inventory are recorded in reactor-domain.json (kernel_library) and
 # a contract test proves the two pins agree.
 dependencies = [
-    "scpn-reactor-kernels @ git+https://github.com/anulum/scpn-reactor-kernels.git@6f574bfdddadf24c6a4c0a020c0a257fec38231a",
+    "scpn-reactor-kernels @ git+https://github.com/anulum/scpn-reactor-kernels.git@0f76b8caa7d2de8f8e8aae6c9927cebaf9bf9cbd",
 ]
+
+# The tier-G2 CAD model is an optional capability, not a runtime
+# requirement of this package: the device configuration, the diagnostics,
+# the level-0 physics and the tier-G1 3D model all work without a B-rep
+# kernel. Declaring the library extra as a hard dependency would overstate
+# what this package needs and would pull a ~1 GB back-end into every
+# environment that installs it, CI job included. It is an extra here too,
+# naming the same commit.
+[project.optional-dependencies]
+cad = ["scpn-reactor-kernels[cad] @ git+https://github.com/anulum/scpn-reactor-kernels.git@0f76b8caa7d2de8f8e8aae6c9927cebaf9bf9cbd"]
 
 [tool.setuptools.dynamic]
 version = { attr = "scpn_mirror_core.__version__" }
@@ -161,6 +171,7 @@ known-first-party = [
     "generate_capability_inventory",
     "preflight",
     "physics_fixtures",
+    "geometry_fixtures",
 ]
 
 [tool.mypy]

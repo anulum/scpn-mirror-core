@@ -14,6 +14,16 @@
       "evidence_maturity": "computational_prototype",
       "evidence_pointer": "VALIDATION.md#level-0-device-physics",
       "identifier": "level0_device_physics"
+    },
+    {
+      "evidence_maturity": "computational_prototype",
+      "evidence_pointer": "VALIDATION.md#device-3d-model",
+      "identifier": "device_3d_model"
+    },
+    {
+      "evidence_maturity": "computational_prototype",
+      "evidence_pointer": "VALIDATION.md#device-cad-model",
+      "identifier": "device_cad_model"
     }
   ],
   "claims": [],
@@ -80,11 +90,21 @@
   },
   "kernel_library": {
     "distribution": "scpn-reactor-kernels",
-    "inventory_sha256": "b065c46b9f54d478d94be5cfeb61e1300b4ddae47e57f3992a985adfb2cb5dbf",
+    "inventory_sha256": "8b409c63435088f2e36d66322ec7a379243474bf8b99856100e8fc4c8add679a",
     "kernels": [
+      "cad_brep_solids",
+      "cad_evidence",
+      "cad_faceting",
+      "cad_profiles",
+      "cad_step_export",
+      "geometry_exports",
+      "geometry_mesh_contract",
+      "geometry_primitives",
+      "geometry_profiles",
+      "geometry_unit_circle",
       "numerics_transcendental"
     ],
-    "source_commit": "6f574bfdddadf24c6a4c0a020c0a257fec38231a",
+    "source_commit": "0f76b8caa7d2de8f8e8aae6c9927cebaf9bf9cbd",
     "version": "0.1.0.dev0"
   },
   "license": "AGPL-3.0-or-later",
@@ -109,7 +129,8 @@
     "actuator_response_model_boundaries",
     "safety_envelope_declaration",
     "control_adapter_specification",
-    "analytic_device_physics_models"
+    "analytic_device_physics_models",
+    "device_geometry_and_3d_model"
   ],
   "project": "SCPN-MIRROR-CORE",
   "research_group": {

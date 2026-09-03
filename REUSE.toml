@@ -27,6 +27,8 @@ path = [
     ".github/FUNDING.yml",
     "rust/Cargo.lock",
     "benchmarks/results/level0_physics.local.json",
+    "benchmarks/results/device_model_3d.local.json",
+    "benchmarks/results/device_model_cad.local.json",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = [

@@ -19,6 +19,16 @@ class DeviceConfigurationError(ValueError):
     """
 
 
+class DeviceGeometryError(ValueError):
+    """Raised when a device geometry or 3D model invariant is violated.
+
+    Every rejection carries the offending field and the violated bound in
+    its message; nothing is clamped or silently corrected. Refusals raised
+    by the shared kernel library are re-raised under this type with the
+    library's message preserved.
+    """
+
+
 class DiagnosticPlanError(ValueError):
     """Raised when a diagnostic or clock declaration violates the model.
 

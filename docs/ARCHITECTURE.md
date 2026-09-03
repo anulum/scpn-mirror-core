@@ -14,12 +14,16 @@ SCPN Mirror Core — Architecture
 
 `SCPN-MIRROR-CORE` is the device-family owner for magnetic-mirror systems
 in the SCPN Reactor Systems Research Group portfolio. The
-repository owns two implemented capabilities at
+repository owns five implemented capabilities at
 `computational_prototype` in `src/scpn_mirror_core/`: the device
 configuration model (design record ADR 0002, evidence record
-`VALIDATION.md#device-configuration-model`) and the diagnostic and
+`VALIDATION.md#device-configuration-model`), the diagnostic and
 clock semantics model (design record ADR 0003, evidence record
-`VALIDATION.md#diagnostic-and-clock-semantics`). Every other
+`VALIDATION.md#diagnostic-and-clock-semantics`), the level-0 device
+physics (ADR 0005 and ADR 0006, evidence record
+`VALIDATION.md#level-0-device-physics`), the device 3D model (ADR 0007,
+evidence record `VALIDATION.md#device-3d-model`) and the device CAD model
+(ADR 0008, evidence record `VALIDATION.md#device-cad-model`). Every other
 section below describes boundaries and contracts. The claim inventory is
 empty; capability and claim inventories are generated and drift-checked.
 
@@ -84,8 +88,10 @@ SCPN-CONTROL ──admitted ControlAction──► independent machine protectio
 |---|---|
 | `reactor-domain.json` | portable source of project identity and contracts |
 | `studio/portfolio-descriptor.json` | derived Studio descriptor, `not_federated` |
-| `capability-inventory.json` | generated inventory of the three implemented capabilities |
+| `capability-inventory.json` | generated inventory of the five implemented capabilities |
 | `src/scpn_mirror_core/physics/` | level-0 device physics (published mirror scalings and closed forms, composed record) |
+| `src/scpn_mirror_core/geometry/` | device envelope, the declared field profile and the flux tube it implies, the tier-G1 3D model, the tier-G2 CAD model and the open-format exports (ADR 0007, ADR 0008) |
+| `docs/DEVICE_3D_MODEL_CONTRACT.md` | consumer-facing contract of the exported model files |
 | `reactor-domain.json` → `kernel_library` | exact pin of `scpn-reactor-kernels` (commit object, kernel-inventory digest, consumed kernel; ADR 0006) |
 | `rust/` | optional native kernels (`scpn-mirror-rs`, depending on the library's Rust crate at the pinned commit), bit-exact with the Python floor |
 | `benchmarks/` | standard-conformant benchmark and committed local artefact |

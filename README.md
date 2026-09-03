@@ -23,7 +23,7 @@ magnetic mirror), `tandem_mirror` (multi-cell linear mirror), and
 `gas_dynamic_mirror` (collisional linear mirror).
 
 **Evidence maturity: `computational_prototype`** (per-capability; ADR 0002).
-Three capabilities are implemented: the device configuration model —
+Five capabilities are implemented: the device configuration model —
 validated parameter objects with documented consistency estimates,
 canonical serialisation, and a data-only SPO registry pin
 (evidence: `VALIDATION.md#device-configuration-model`); the
@@ -37,14 +37,27 @@ gas-dynamic confinement scalings, FLR criterion, fast-ion adiabaticity,
 and the tandem Pastukhov chain) evaluated on the validated configuration
 through the pinned shared numerics kernels of `scpn-reactor-kernels`,
 with optional native kernels proven bit-exact against the Python floor
-(ADR 0005 and ADR 0006, evidence: `VALIDATION.md#level-0-device-physics`).
-No parameter set or channel describes any real machine or diagnostic; the
-claim inventory is empty and verified by the domain validator.
+(ADR 0005 and ADR 0006, evidence: `VALIDATION.md#level-0-device-physics`);
+the device 3D model — ten analytic bodies of a validated mechanical
+envelope, whose plasma body is a **flux tube** built from a declared axial
+field profile under flux conservation, refused unless it passes the
+mirror-coil bore it has to clear (ADR 0007, evidence:
+`VALIDATION.md#device-3d-model`); and the device CAD model — the same ten
+bodies as exact B-rep solids with a deterministic STEP export, on an
+optional CAD extra and checked fail-closed against the analytic closed
+forms (ADR 0008, evidence: `VALIDATION.md#device-cad-model`).
+No parameter set, channel or dimension describes any real machine or
+diagnostic; the claim inventory is empty and verified by the domain
+validator.
 
 ## Scope
 
 This repository owns, for the magnetic-mirror device family:
 
+- the device geometry and its 3D and CAD models: the mechanical envelope
+  of the assembly and the ten bodies derived from it at both tiers, on the
+  shared geometry and CAD kernels (no equation is solved and no
+  engineering property is carried);
 - the analytic device physics models: closed-form and 0-D models from the
   mirror literature evaluated on the validated configuration (no solver
   code, no FUSION seam); the transcendental kernels they use are the

@@ -303,3 +303,214 @@ gate:
   domain (`clk_facility` root, `clk_shot` member); multi-domain rules
   are exercised by test-constructed plans. Scopes are declarations;
   `mapping_state` stays `unmapped`.
+
+## Device 3D model
+
+Evidence record of the `device_3d_model` capability
+(`computational_prototype`; design records: `docs/adr/0007-device-3d-model.md`
+and `docs/adr/0006-shared-numerics-kernels.md`; consumer contract:
+`docs/DEVICE_3D_MODEL_CONTRACT.md`).
+
+The unit circle, the tessellation primitives, the profiled surface of
+revolution, the closed-mesh contract and the STL/GLB serialisers are
+consumed from the shared kernel library `scpn-reactor-kernels`, pinned in
+the manifest (`kernel_library`: commit object and kernel-inventory digest)
+and in `pyproject.toml`; their evidence (polynomial accuracy against
+`libm`, exact polygon-prism identities, the exact frustum-stack closed
+forms of a linear profile, quadratic convergence, closure and
+orientation, export layouts, native parity) is the library's, at its
+`VALIDATION.md#geometry-kernels`. What this repository exercises, all
+under the coverage gate (`src/scpn_mirror_core/geometry/`):
+
+- **Device geometry** (`DeviceGeometry`): thirteen SI parameters of the
+  axisymmetric mirror envelope (central-cell vessel bore and wall;
+  central-cell coil offset, bore, winding and length; mirror-coil warm
+  bore, winding and length; expansion-tank bore, wall and length;
+  end-wall thickness) with fail-closed positivity on every field,
+  canonical bytes, SHA-256 digest and a strict parser refusing unknown
+  fields, non-numbers and non-finite literals; every rejection branch is
+  tested. Two envelope relations are refused in the direction they are
+  wrong: a central-cell coil inside the vessel wall it is wound around,
+  and a tank no wider than the throat it opens from. The mirror-coil
+  positions are not repeated here: each coil is centred on a throat at
+  `±central_cell_length_m / 2`, read from the validated configuration.
+- **Declared axial field profile** (`scpn_mirror_core.geometry.profile`):
+  the profile contract (at least two `(z, B)` samples, pairs, finite
+  heights, strictly positive fields, strictly increasing heights) with
+  the offending index named; the midplane sample at `z = 0` required
+  because the declared midplane radius belongs to that plane; the throat
+  field as the maximum; and the single relation
+  `r(z) = r_mid sqrt(B_mid / B(z))` checked sample by sample against an
+  independent evaluation, with the midplane radius reproduced bit for bit
+  and the narrowest radius equal to `r_mid / sqrt(R_m)` for the mirror
+  ratio the configuration validates.
+- **Aperture clearance**: the largest flux-tube radius inside each axial
+  section against that section's bore, computed exactly (linear in radius
+  between samples, sample heights returned exactly rather than through
+  the interpolation); a section the column never enters carries no entry;
+  a column as wide as a bore is refused, and the refusal names the
+  section and its bore. Placed cases prove each of the three bores can be
+  the one that refuses.
+- **Kernel library pin**: the manifest block `kernel_library` is validated
+  field by field (distribution, version, 40-hex source commit, 64-hex
+  inventory digest, sorted unique kernel identifiers, no other field); a
+  contract test proves the manifest, the `pyproject.toml` dependency and
+  its `cad` extra, the crate `rev`, the lock file, the installed library
+  version and the CI install steps all name one commit.
+- **Device model** (`DeviceModel3D`, `scpn.mirror-3d-model.v1` `1.0.0`):
+  ten bodies in the fixed order with declared roles and materials; the
+  axial stations recomputed in the tests from the fixture numbers rather
+  than read back from the model; the mirror coils centred on the throats;
+  the vessel spanning between their inboard faces; both central-cell
+  coils outside the vessel wall and inside the cell; each tank starting
+  at its coil's outboard face and each end wall closing its tank;
+  convergence of every body volume to its analytic closed form,
+  frustum-stack included; the flux tube proved not to be a body of
+  constant radius, with the ratio of its extreme radii equal to the root
+  of the field ratio; the aperture clearances; determinism (two builds
+  equal, digests equal); a different declared field giving a different
+  model but the same vessel; canonical bytes and one pinned reference
+  digest (segments = 8) as an immutability fixture.
+- **Build invariants**, one refusal per case: the segment rule; a
+  non-finite or non-positive midplane radius; a cell no longer than a
+  mirror coil; central-cell coils crossing the midplane or leaving the
+  cell; the profile contract; a missing midplane sample; a midplane or
+  throat field contradicting the configuration; a field maximum away from
+  a throat; a profile stopping short of the throats or reaching past the
+  vacuum envelope; each of the three aperture refusals; the fixed body
+  inventory. A uniform field — the one that would make the column a
+  cylinder — is unreachable: the configuration refuses a mirror ratio of
+  one.
+- **Anchor**: `tests/test_geometry_anchor.py` carries the values printed
+  in sections 2 and 2.1 of the WHAM physics basis already on file (D.
+  Endrizzi et al., J. Plasma Phys. 89 (2023) 975890501, CC BY 4.0):
+  plasma radius `a = 0.1 m`, `17 T` magnets with a `5.5 cm` warm bore
+  centred at `z = ±98 cm`, a further coil pair at `z = ±20 cm`, and a
+  central field raised to `0.86 T`. Each printed value is proved to
+  appear in the built bodies, the arithmetic that forced this family is
+  asserted (a body of constant radius `0.1 m` does not pass a bore of
+  radius `0.0275 m`), and the column is proved to narrow *through* the
+  printed bore with the clearance recorded. Everything the source does
+  not print is declared and marked as declared, **the axial profile
+  between the printed endpoints included**; a test shows that the coarse
+  profile of the printed endpoints alone is a different body and not a
+  bound on the finer one. Reproducing a printed dimension is an anchor,
+  never a claim about that machine.
+- **Exports**: the device-side provenance record (`glb_extras`: schema,
+  both source digests, model digest, midplane radius, declared field
+  profile, flux-tube profile, aperture clearances, segment count, units,
+  non-claims) is exactly what the library's GLB carries as document
+  `extras`; the bytes are proven identical to the library serialisers
+  called directly; the binary STL and glTF 2.0 binary layouts are read
+  back with minimal specification-level readers; determinism of the
+  bytes; the file writers.
+- **Native parity**: `tests/test_geometry_native_parity.py` builds the ten
+  device bodies on the library's Python floor and compares float64 bit
+  patterns of every vertex coordinate, the face index streams, the signed
+  volume and the surface area against the library's native module
+  (`scpn_reactor_kernels_native`) at three segment counts, and the exact
+  frustum-stack volume and lateral area of the flux-tube profile on both
+  floors. The consumer inherits the library's parity rather than
+  re-proving the kernels. The crate in `rust/` carries physics only and is
+  unchanged by this capability.
+- **Benchmark**: `benchmarks/device_model_3d.py` per the ecosystem
+  benchmark standard, measuring the library's Python floor (through the
+  validated device build) against the library's native kernels; results
+  in `docs/benchmarks.md` and the committed local artefact
+  `benchmarks/results/device_model_3d.local.json`.
+
+Bounded claims — what is NOT claimed:
+
+- The bodies are analytic surfaces of a declared design: no B-rep solid,
+  no equilibrium boundary, no engineering model. The plasma body is the
+  surface of revolution of a DECLARED axial field profile under flux
+  conservation — not an equilibrium boundary, not an anisotropic-pressure
+  solution, not a prediction of any machine.
+- No field is solved, fitted or smoothed. Between two samples the surface
+  is a straight line in radius and nothing more, and no local field
+  structure between samples is resolved.
+- The end walls are plain closing discs of the tank outer diameter; the
+  pumping ducts, limiters, end rings, gas valves, heating hardware,
+  struts and cryostats of a real assembly are not modelled. The coils are
+  winding envelopes and carry no current and no force.
+- No material property, load, field, thermal or neutronic quantity is
+  carried; the material tokens are declarations only.
+- The tessellation is exact only as an inscribed polygonal body: every
+  volume and area is below the analytic value by the declared deficit,
+  and that deficit is measured, not assumed.
+- No value describes, approximates or validates any real machine; the
+  benchmark measures tessellation cost of two implementations of the same
+  kernels, not physics.
+- Maturity stays `computational_prototype`.
+
+## Device CAD model
+
+Evidence record of the `device_cad_model` capability
+(`computational_prototype`; design record: `docs/adr/0008-device-cad-model.md`;
+consumer contract: `docs/DEVICE_3D_MODEL_CONTRACT.md`).
+
+The B-rep bodies, the revolved profile, the normalised STEP writer, the
+faceting and the per-body evidence are consumed from the same pinned
+shared kernel library (`cad_brep_solids`, `cad_profiles`,
+`cad_step_export`, `cad_faceting`, `cad_evidence`); their evidence is the
+library's, at its `VALIDATION.md#cad-kernels`. **The CAD back-end is an
+optional extra of this package** (`pip install ".[cad]"`), naming the same
+library commit as the base dependency, with a contract test proving the
+two agree; the tests skip hermetically when it is absent, and exactly two
+CI jobs install it. What this repository exercises:
+
+- **Same design, two tiers**: the CAD bodies carry the same names, roles,
+  materials and order as the tier-G1 bodies, and the CAD record carries
+  the identical declared field profile, flux-tube profile and aperture
+  clearances as the tier-G1 record — so the two tiers are one design, not
+  two similar ones.
+- **B-rep against the closed forms**: every body's volume and surface area
+  from the pinned OpenCASCADE kernel against the analytic closed form
+  within the library's declared relative tolerance `1e-9`. For the flux
+  tube that closed form is the exact frustum-stack sum of its linear
+  profile, so the comparison is an agreement between two exact
+  quantities, not a convergence.
+- **Faceting bounds**: every faceted body underestimates its analytic
+  volume within the declared chord-deficit bound `2 d / r` at the body's
+  smallest circular radius, every faceted mesh satisfies the closed-mesh
+  contract, and every faceted volume tracks the tier-G1 mesh at the
+  declared reference segment count within the exact polygon-deficit
+  bound.
+- **Placement**: the device-level identities (vessel meeting both coils,
+  each tank at its coil's outboard face, each end wall closing its tank,
+  the coils centred on the throats) hold in the B-rep bounding boxes of
+  the assembly manifest, which are the exact boxes of the geometry.
+- **The anchor at tier G2**: the revolved column of the printed
+  arrangement spans the printed throat positions, carries the printed
+  midplane radius, and clears the printed warm bore with a positive
+  recorded clearance.
+- **STEP**: byte determinism of two builds in one pinned environment; the
+  written file is exactly the digested bytes; a round trip through a
+  separate reader process reproduces every body volume within `1e-9`
+  relative.
+- **Record and refusals**: schema identity, canonical sorted bytes, one
+  pinned reference digest, and fail-closed refusal of an invalid segment
+  count, an invalid deflection, a foreign body inventory, a foreign
+  manifest, a malformed STEP digest, and an aperture violation (the
+  tier-G1 refusal reached through the CAD build).
+- **Benchmark**: `benchmarks/device_model_cad.py` times four operations —
+  revolving the ten bodies and hashing the manifest, the normalised STEP
+  export, faceting all ten bodies, and the full checked record build — on
+  the composition the model itself uses; results in `docs/benchmarks.md`
+  and the committed local artefact
+  `benchmarks/results/device_model_cad.local.json`.
+
+Bounded claims — what is NOT claimed:
+
+- STEP bytes are deterministic **within one pinned back-end environment**;
+  identity across OpenCASCADE or gmsh versions is not claimed, and a
+  back-end bump re-pins the reference digests as a governed data change.
+- The B-rep solids are exact surfaces of a declared design, not an
+  engineering model: no property, load, field or neutronic quantity is
+  carried, and the flux tube remains the revolved surface of a declared
+  field profile.
+- The third-party kernel is checked, never trusted: every body carries its
+  analytic reference and the measured relative error next to it, and a
+  body that violates a declared bound cannot be built into a record.
+- No value describes, approximates or validates any real machine.
+- Maturity stays `computational_prototype`.

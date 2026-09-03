@@ -14,6 +14,47 @@ SCPN Mirror Core — CHANGELOG
 
 ### Added
 
+- Device 3D model (`src/scpn_mirror_core/geometry/`), the fourth
+  implemented capability at `computational_prototype` (ADR 0007): a
+  validated `DeviceGeometry` of thirteen SI envelope parameters
+  (central-cell vessel, central-cell coil pair, mirror-coil pair,
+  expansion tanks, end walls) and ten named, closed, outward-oriented
+  bodies derived from it. Nine are surfaces of constant radius; the tenth
+  is not. The confined plasma of a mirror is a **flux tube**, so it is
+  built as a surface of revolution through the `(z, radius)` profile that
+  a **declared** axial field profile implies under flux conservation,
+  `r(z) = r_mid sqrt(B_mid / B(z))` — the one physical relation this tier
+  applies. The mirror coils are centred on the throats at
+  `±central_cell_length_m / 2`, read from the validated configuration, so
+  the cell length has one home. The build cross-checks the declared
+  profile against the configuration's own `b_min_t` and `b_max_t`,
+  refuses a field maximum away from a throat, and **refuses a design in
+  which the column does not pass the bore it has to clear**, naming the
+  section; the record carries the per-section aperture clearance. Open
+  format exports (binary STL, glTF 2.0 binary) carry the declared field
+  profile as document provenance. The geometry, profile and CAD kernels
+  are the pinned shared library's, re-pinned to the commit that carries
+  them; bit-exact native parity against the library's native module
+  covers all ten bodies, the profiled tube included, plus its exact
+  frustum-stack closed forms. Consumer contract in
+  `docs/DEVICE_3D_MODEL_CONTRACT.md`, benchmark
+  `benchmarks/device_model_3d.py` with a committed local artefact.
+- Device CAD model (`src/scpn_mirror_core/geometry/cad.py`), the fifth
+  implemented capability at `computational_prototype` (ADR 0008): the
+  same ten bodies as exact B-rep solids on the pinned third-party
+  OpenCASCADE kernel through the shared library's CAD kernels, with the
+  flux tube revolved through the same profile the tessellation is built
+  from. Every body is checked fail-closed against its analytic closed
+  form within `1e-9` relative — for the flux tube that form is the exact
+  frustum-stack sum of its linear profile — against the declared faceting
+  chord-deficit bound and against the tier-G1 mesh within the exact
+  polygon-deficit bound. Normalised deterministic STEP export with its
+  digest in the record. **The CAD back-end is an optional extra**
+  (`pip install ".[cad]"`) naming the same library commit as the base
+  dependency, proven by a contract test: the other four capabilities work
+  without a B-rep kernel, and only two CI jobs install it. Benchmark
+  `benchmarks/device_model_cad.py` with a committed local artefact.
+
 - Level-0 device physics (`src/scpn_mirror_core/physics/`), the third
   implemented capability at `computational_prototype` (ADR 0005): the
   diamagnetic mirror ratio and the potential-modified loss boundary, the

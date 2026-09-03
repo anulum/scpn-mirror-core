@@ -20,6 +20,16 @@
       "evidence_maturity": "computational_prototype",
       "evidence_pointer": "VALIDATION.md#level-0-device-physics",
       "identifier": "level0_device_physics"
+    },
+    {
+      "evidence_maturity": "computational_prototype",
+      "evidence_pointer": "VALIDATION.md#device-3d-model",
+      "identifier": "device_3d_model"
+    },
+    {
+      "evidence_maturity": "computational_prototype",
+      "evidence_pointer": "VALIDATION.md#device-cad-model",
+      "identifier": "device_cad_model"
     }
   ],
   "configurations": [
@@ -63,7 +73,7 @@
     "manifest_path": "reactor-domain.json",
     "manifest_schema": "scpn.reactor-domain.v1",
     "manifest_schema_version": "1.0.0",
-    "manifest_sha256": "3a744b6a93a69f317972d0654e246e20da2721661079920cfb2f2cd86a966551",
+    "manifest_sha256": "260e2b5a3ed981b372d611ed89db70b5494f7b4149768d1246d1290021ba738e",
     "repository": "SCPN-MIRROR-CORE"
   },
   "spo_registry": {
