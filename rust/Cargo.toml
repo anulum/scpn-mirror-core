@@ -27,7 +27,7 @@ python = ["dep:pyo3"]
 # The shared kernel library at the commit pinned in reactor-domain.json
 # (kernel_library.source_commit); its vendored logarithm, exponential and
 # power are the same series the Python floor evaluates.
-scpn-reactor-kernels-rs = { git = "https://github.com/anulum/scpn-reactor-kernels.git", rev = "0f76b8caa7d2de8f8e8aae6c9927cebaf9bf9cbd", default-features = false }
+scpn-reactor-kernels-rs = { git = "https://github.com/anulum/scpn-reactor-kernels.git", rev = "98e6de5139f8856f5d50b4ac86f531b7dc38c1dc", default-features = false }
 pyo3 = { version = "0.29", features = ["extension-module"], optional = true }
 
 [lints.rust]

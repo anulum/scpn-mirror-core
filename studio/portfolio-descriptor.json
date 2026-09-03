@@ -73,7 +73,7 @@
     "manifest_path": "reactor-domain.json",
     "manifest_schema": "scpn.reactor-domain.v1",
     "manifest_schema_version": "1.0.0",
-    "manifest_sha256": "260e2b5a3ed981b372d611ed89db70b5494f7b4149768d1246d1290021ba738e",
+    "manifest_sha256": "91a0925780c73580938e5cd2665f2466e41f479b2e87142ff343554480e6f1cc",
     "repository": "SCPN-MIRROR-CORE"
   },
   "spo_registry": {
