@@ -245,8 +245,10 @@ def test_kernel_library_pin_agrees_with_the_dependency_the_crate_and_the_package
     assert pin["kernels"] == ["numerics_transcendental"]
     project = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
     assert project["project"]["dependencies"] == [
-        "scpn-reactor-kernels @ git+https://github.com/anulum/"
-        f"scpn-reactor-kernels.git@{pin['source_commit']}"
+        (
+            "scpn-reactor-kernels @ git+https://github.com/anulum/"
+            f"scpn-reactor-kernels.git@{pin['source_commit']}"
+        )
     ]
     assert scpn_reactor_kernels.__version__ == pin["version"]
     cargo = tomllib.loads((REPO / "rust" / "Cargo.toml").read_text(encoding="utf-8"))

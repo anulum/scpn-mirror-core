@@ -99,7 +99,7 @@ def floor_pass(sample_grid: list[tuple[float, float, float]]) -> float:
         total += loss_boundary(effective, 1.0, 25.0, 5.0).isotropic_fraction
         total += collision_times(density, 1.0, 25.0, 2.0, 1.0).ion_scattering_time_s
         total += confinement_scalings(
-            effective, 1.0, density, 1.0, 25.0, 2.0, False
+            effective, 1.0, density, 1.0, 25.0, 2.0, collisional_regime=False
         ).classical_time_s
         total += flr_criterion(0.1, 1.0, 25.0, 2.0, 1.0, 0.86).critical_mode_number
         alpha = adiabaticity(0.5, 0.7, 25.0, 2.0, 1.0, 0.86).alpha

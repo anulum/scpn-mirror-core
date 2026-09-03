@@ -53,13 +53,19 @@ from scpn_mirror_core.physics.tandem import TandemConfinement, tandem_confinemen
 LEVEL0_SCHEMA: Final = "scpn.mirror-level0-physics.v1"
 LEVEL0_SCHEMA_VERSION: Final = "1.0.0"
 LEVEL0_NON_CLAIMS: Final = (
-    "closed-form evaluation of published mirror scalings and closed forms on a "
-    "synthetic configuration",
-    "no equation is solved: no Fokker-Planck, no self-consistent ambipolar "
-    "potential, no equilibrium or stability eigenproblem",
+    (
+        "closed-form evaluation of published mirror scalings and closed forms on a "
+        "synthetic configuration"
+    ),
+    (
+        "no equation is solved: no Fokker-Planck, no self-consistent ambipolar "
+        "potential, no equilibrium or stability eigenproblem"
+    ),
     "no fusion power, gain, breakeven or m = 1 stability statement",
-    "no value describes or validates any real machine; the anchors reproduce "
-    "numbers and statements printed in the sources",
+    (
+        "no value describes or validates any real machine; the anchors reproduce "
+        "numbers and statements printed in the sources"
+    ),
 )
 ELECTRON_CHARGE_NUMBER: Final = -1.0
 TANDEM_IDENTIFIER: Final = "tandem_mirror"
@@ -372,7 +378,7 @@ def level0_physics(
         inputs.electron_temperature_kev,
         inputs.ion_energy_kev,
         inputs.ion_mass_amu,
-        configuration.collisional_regime,
+        collisional_regime=configuration.collisional_regime,
     )
     flr = flr_criterion(
         inputs.plasma_radius_m,

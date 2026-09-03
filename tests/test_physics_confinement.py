@@ -54,10 +54,14 @@ def test_gas_dynamic_dimensional_form_and_printed_coefficient() -> None:
 
 def test_regime_disposition_follows_the_declaration() -> None:
     """The collisional declaration selects the gas-dynamic time."""
-    classical = confinement_scalings(20.0, 1.0, 3.0e19, 1.0, 25.0, 2.0, False)
+    classical = confinement_scalings(
+        20.0, 1.0, 3.0e19, 1.0, 25.0, 2.0, collisional_regime=False
+    )
     assert classical.regime == REGIME_CLASSICAL
     assert classical.regime_time_s == classical.classical_time_s
-    gas = confinement_scalings(20.0, 1.0, 3.0e19, 1.0, 25.0, 2.0, True)
+    gas = confinement_scalings(
+        20.0, 1.0, 3.0e19, 1.0, 25.0, 2.0, collisional_regime=True
+    )
     assert gas.regime == REGIME_GAS_DYNAMIC
     assert gas.regime_time_s == gas.gas_dynamic_time_s
     assert set(gas.to_record()) == {

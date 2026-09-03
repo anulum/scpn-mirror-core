@@ -74,7 +74,9 @@ def test_ratio_boundaries_collisions_and_confinement_are_bit_exact(
             floor_c.equal_time_electron_temperature_kev,
         )
     )
-    floor_s = confinement_scalings(effective, 1.0, density, 1.0, energy, mass, False)
+    floor_s = confinement_scalings(
+        effective, 1.0, density, 1.0, energy, mass, collisional_regime=False
+    )
     got_s = native.confinement_scalings(effective, 1.0, density, 1.0, energy, mass)
     assert _bits(got_s) == _bits(
         (

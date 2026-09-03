@@ -36,6 +36,7 @@ def synthetic_configuration(
     identifier: str = "simple_magnetic_mirror",
     b_max_t: float = 10.0,
     end_plug_cell_count: int = 0,
+    *,
     collisional_regime: bool = False,
 ) -> DeviceConfiguration:
     """Build a valid synthetic configuration with optional overrides."""

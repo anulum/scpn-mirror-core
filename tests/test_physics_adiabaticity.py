@@ -45,9 +45,9 @@ def test_alpha_scales_with_field_squared_and_inversely_with_the_fraction() -> No
     base = adiabaticity(1.0, 0.5, 10.0, 2.0, 1.0, 1.0).alpha
     doubled_field = adiabaticity(1.0, 0.5, 10.0, 2.0, 1.0, 2.0).alpha
     halved_fraction = adiabaticity(1.0, 0.25, 10.0, 2.0, 1.0, 1.0).alpha
-    assert (
-        base is not None and doubled_field is not None and halved_fraction is not None
-    )
+    assert base is not None
+    assert doubled_field is not None
+    assert halved_fraction is not None
     assert math.isclose(doubled_field / base, 2.0, rel_tol=1.0e-12)
     assert math.isclose(halved_fraction / base, 2.0, rel_tol=1.0e-12)
 

@@ -161,6 +161,7 @@ def confinement_scalings(
     electron_temperature_kev: float,
     ion_energy_kev: float,
     ion_mass_amu: float,
+    *,
     collisional_regime: bool,
 ) -> ConfinementScalings:
     """Evaluate both scalings and select the regime's time.
