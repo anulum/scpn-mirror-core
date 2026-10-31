@@ -51,7 +51,7 @@ WIDTH_IN, HEIGHT_IN, DPI = 12.8, 6.4, 100
 
 TITLE_METRICS: list[tuple[str, str]] = [
     ("Device Configurations", "simple · tandem · gas_dynamic"),
-    ("Plug Invariant", "tandem = 2 end plugs, others 0 (Post 1987)"),
+    ("Plug Invariant", "tandem = 2 end plugs, others 0 (Frank 2025)"),
     ("Collisional Regime", "gas-dynamic only (Mirnov-Ryutov 1979)"),
     ("Loss Cone", "fraction above one half flagged"),
     ("Plan Envelope", "v1.1.0 · synthetic · review-only"),
@@ -436,8 +436,8 @@ def generate_cell_layouts() -> None:
     ax.text(
         5.0,
         0.35,
-        "coil class contradicting its identifier is rejected · Post, "
-        "Nucl. Fusion 27 (1987) 1579",
+        "coil class contradicting its identifier is rejected · Frank et "
+        "al., J. Plasma Phys. 91 (2025) E110",
         color="#445566",
         fontsize=7.5,
         fontfamily="monospace",
