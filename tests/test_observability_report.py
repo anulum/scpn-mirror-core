@@ -90,7 +90,8 @@ def test_report_flags_band_outside_typical_range() -> None:
     )
     findings = plan.consistency_report()
     assert len(findings) == 1
-    assert "Post 1987" in findings[0].message
+    assert "declared interchange/flute design band" in findings[0].message
+    assert "Post" not in findings[0].message
 
 
 def test_report_flags_drive_outside_heating_range() -> None:
@@ -129,7 +130,8 @@ def test_report_flags_drive_outside_heating_range() -> None:
     )
     findings = plan.consistency_report()
     assert len(findings) == 1
-    assert "ICRF" in findings[0].message
+    assert "declared ICRF-to-ECRH drive design band" in findings[0].message
+    assert "Post" not in findings[0].message
 
 
 def test_report_flags_clock_coarser_than_sampling() -> None:
@@ -183,6 +185,7 @@ def test_report_flags_window_beyond_device_ceiling() -> None:
     findings = plan.consistency_report()
     assert len(findings) == 1
     assert "acquisition window" in findings[0].message
+    assert "declared 10 s" in findings[0].message
 
 
 def test_report_flags_array_size_outside_common_range() -> None:

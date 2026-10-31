@@ -48,7 +48,7 @@ bind. Four candidates apply to the configurations this repository owns: `open.dr
    clock).
 4. Timing is fail-closed where physics fixes the bound: the Nyquist
    criterion for both cyclic classes. The device-typical band checks
-   are advisory only: the mirror low-frequency interchange/flute instability scale 0.1–100 kHz and the ICRF-to-ECRH heating range 1 MHz–200 GHz (R. F. Post, Nucl. Fusion 27 (1987) 1579).
+   are advisory only: the declared interchange/flute design band 0.1–100 kHz and the declared ICRF-to-ECRH drive design band 1 MHz–200 GHz (synthetic bounds, not checked against a source on file). On 2026-10-31 their credit to R. F. Post, Nucl. Fusion 27 (1987) 1579 was removed: that review is not on file, so no page of it was read for these numbers.
 5. The reference plan mirrors canonical practice with synthetic
    declarations: a diamagnetic loop and an end-loss analyser array (noncyclic against the plasma build-up epoch), an RF drive-phase reference (direct cyclic against the facility clock), a flute-mode probe array (derived cyclic against the facility clock), and the model-owned synthetic oscillator (simulation clock). Every applicable candidate must be
    planned or explicitly deferred with a reason; every channel is

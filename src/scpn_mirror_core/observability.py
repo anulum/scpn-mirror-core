@@ -1445,8 +1445,9 @@ class DiagnosticPlan:
                         message=(
                             "declared interchange/flute band "
                             f"{channel.max_signal_frequency_hz:.1f} "
-                            "Hz is outside the mirror low-frequency "
-                            "instability scale 0.1-100 kHz (Post 1987)"
+                            "Hz is outside the declared interchange/flute "
+                            "design band 0.1-100 kHz (synthetic; not "
+                            "checked against a source on file)"
                         ),
                     )
                 )
@@ -1459,9 +1460,9 @@ class DiagnosticPlan:
                         message=(
                             "declared drive frequency "
                             f"{channel.max_signal_frequency_hz:.1f} "
-                            "Hz is outside the ICRF-to-ECRH heating range "
-                            "1 MHz-200 GHz used on mirror machines "
-                            "(Post 1987)"
+                            "Hz is outside the declared ICRF-to-ECRH drive "
+                            "design band 1 MHz-200 GHz (synthetic; not "
+                            "checked against a source on file)"
                         ),
                     )
                 )
@@ -1472,8 +1473,9 @@ class DiagnosticPlan:
                         message=(
                             "acquisition window "
                             f"{channel.acquisition_duration_s:.2e} s is "
-                            "longer than the mirror steady-shot scale of up to "
-                            "~10 s (Post 1987)"
+                            "longer than the declared 10 s shot-duration "
+                            "bound (synthetic; not checked against a "
+                            "source on file)"
                         ),
                     )
                 )
