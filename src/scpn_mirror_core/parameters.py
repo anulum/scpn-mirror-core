@@ -10,8 +10,11 @@
 
 The derived quantity implements one standard result and nothing more:
 the isotropic loss-cone fraction ``f_lc = 1 - sqrt(1 - 1/R_m)`` of a
-mirror with ratio ``R_m = B_max / B_min`` (R. F. Post, Nucl. Fusion 27
-(1987) 1579). It is a rough consistency instrument with documented
+mirror with ratio ``R_m = B_max / B_min``. It is derived here, not read
+from a source: conservation of the magnetic moment puts the loss-cone
+edge at ``sin^2(theta) = 1/R_m``, and the solid angle of the two cones
+is the fraction ``1 - cos(theta)`` of an isotropic distribution. It is a
+rough consistency instrument with documented
 applicability bounds; no claim about any real machine follows from it.
 """
 
@@ -135,7 +138,7 @@ class MirrorField:
         Returns
         -------
         float
-            ``f_lc = 1 - sqrt(1 - 1/R_m)`` (Post, NF 27 (1987) 1579) —
+            ``f_lc = 1 - sqrt(1 - 1/R_m)`` (derived in the module) —
             the fraction of an isotropic distribution born inside the
             loss cone; a consistency instrument, not a confinement
             claim.

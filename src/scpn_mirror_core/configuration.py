@@ -12,9 +12,13 @@ A :class:`DeviceConfiguration` composes a validated mirror field and
 cell layout under exactly one of the three registry identifiers this
 repository owns. The class invariants are hard: a tandem mirror carries
 exactly two end plugs, the simple and gas-dynamic classes carry none
-(R. F. Post, Nucl. Fusion 27 (1987) 1579), and only the gas-dynamic
-class declares the collisional regime that defines it (V. V. Mirnov,
-D. D. Ryutov, Sov. Tech. Phys. Lett. 5 (1979) 279). Serialisation is
+(the tandem central cell "is flanked by two simple mirror end plugs",
+S. Frank et al., J. Plasma Phys. 91 (2025) E110, PDF p. 2), and only
+the gas-dynamic class declares the collisional regime that defines it
+(V. V. Mirnov, D. D. Ryutov, Sov. Tech. Phys. Lett. 5 (1979) 279, not
+on file; the filed WHAM physics basis, D. Endrizzi et al., J. Plasma
+Phys. 89 (2023) 975890501, PDF p. 2, sets the gas-dynamic regime apart
+by its strong sonic losses). Serialisation is
 canonical (sorted keys, no NaN or infinity accepted anywhere) and the
 SHA-256 digest of those bytes identifies the exact parameter set. The
 registry binding is a data pin only — this package never imports SCPN

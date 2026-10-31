@@ -37,14 +37,20 @@ repository-level `evidence_maturity` semantics follow the family pilot.
 3. Hard class invariants: ``B_max > B_min > 0`` (a mirror ratio above
    one is the defining property of the family); `tandem_mirror`
    requires exactly two end-plug cells, `simple_magnetic_mirror` and
-   `gas_dynamic_mirror` require zero (R. F. Post, Nucl. Fusion 27
-   (1987) 1579); `gas_dynamic_mirror` requires the collisional-regime
-   declaration and the other two classes forbid it — collisional
-   confinement is the defining property of the gas-dynamic trap
-   (V. V. Mirnov, D. D. Ryutov, Sov. Tech. Phys. Lett. 5 (1979) 279).
+   `gas_dynamic_mirror` require zero (the tandem central cell "is
+   flanked by two simple mirror end plugs": S. Frank et al., J. Plasma
+   Phys. 91 (2025) E110, PDF p. 2); `gas_dynamic_mirror` requires the
+   collisional-regime declaration and the other two classes forbid it —
+   collisional confinement is the defining property of the gas-dynamic
+   trap (V. V. Mirnov, D. D. Ryutov, Sov. Tech. Phys. Lett. 5 (1979)
+   279, not on file; the filed WHAM physics basis, Endrizzi et al. 2023,
+   PDF p. 2, sets the gas-dynamic regime apart by its strong sonic
+   losses).
 4. Advisory estimates, reported by `consistency_report()` and never
    clamped: the isotropic loss-cone fraction
-   ``f_lc = 1 - sqrt(1 - 1/R_m)`` (Post 1987) above one half is
+   ``f_lc = 1 - sqrt(1 - 1/R_m)`` (derived from conservation of the
+   magnetic moment: loss-cone edge at ``sin^2(theta) = 1/R_m``) above
+   one half is
    flagged, and a `gas_dynamic_mirror` with ``R_m < 10`` is flagged
    (the gas-dynamic regime relies on a large mirror ratio).
 5. Repository-level `evidence_maturity` = the highest state claimed by
@@ -64,3 +70,11 @@ repository-level `evidence_maturity` semantics follow the family pilot.
 - Later lanes (axial-profile diagnostic semantics, safety envelope)
   build on these types; maturity advances per capability only with the
   evidence the family standard requires.
+
+## Amendment 2026-10-31
+
+The end-plug invariant and the loss-cone fraction were credited to
+R. F. Post, Nucl. Fusion 27 (1987) 1579. That review is not on file and no
+page of it was read for them. The end-plug count is now bound to the
+filed Frank et al. (2025) text, and the loss-cone fraction is stated as
+derived. No invariant, formula or threshold changed.
