@@ -63,7 +63,7 @@ def test_descriptor_projects_identity_without_authority() -> None:
     assert descriptor["lifecycle"]["state"] == "not_federated"
     assert descriptor["schema_version"] == "1.1.0"
     assert descriptor["source"]["repository"] == descriptor["project"]
-    assert descriptor["lifecycle"]["evidence_pointer"] is None
+    assert descriptor["lifecycle"]["evidence_pointer"] == "VALIDATION.md"
     authority = descriptor["authority"]
     assert authority["allowed_action_authority"] == "none"
     assert authority["spo_actionable"] is False

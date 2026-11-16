@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from manifest_io import load_json_object
+from manifest_io import canonical_json_bytes, load_json_object
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -197,7 +197,15 @@ def test_descriptor_and_inventory_embed_current_manifest_digest() -> None:
     assert descriptor["source"]["manifest_sha256"] == digest
     assert inventory["source"]["manifest_sha256"] == digest
     assert descriptor["lifecycle"]["state"] == "not_federated"
+    assert descriptor["lifecycle"]["evidence_pointer"] == "VALIDATION.md"
+    assert (REPO / descriptor["lifecycle"]["evidence_pointer"]).is_file()
     assert inventory["implemented_capability_count"] == 5
+
+
+def test_manifest_bytes_follow_the_producer_canonical_encoding() -> None:
+    """Intake receives canonical source bytes, not only a self-consistent digest."""
+    path = REPO / "reactor-domain.json"
+    assert path.read_bytes() == canonical_json_bytes(load_json_object(path))
 
 
 def test_no_agent_state_trees_exist() -> None:
@@ -283,10 +291,23 @@ def test_kernel_library_pin_agrees_with_the_dependency_the_crate_and_the_package
     crate = cargo["dependencies"]["scpn-reactor-kernels-rs"]
     assert crate["git"] == "https://github.com/anulum/scpn-reactor-kernels.git"
     assert crate["rev"] == pin["source_commit"]
-    lock = (REPO / "rust" / "Cargo.lock").read_text(encoding="utf-8")
-    assert f"#{pin['source_commit']}" in lock
+    lock = tomllib.loads((REPO / "rust" / "Cargo.lock").read_text(encoding="utf-8"))
+    packages = [
+        package
+        for package in lock["package"]
+        if package["name"] == "scpn-reactor-kernels-rs"
+    ]
+    assert len(packages) == 1
+    assert packages[0]["source"] == (
+        "git+https://github.com/anulum/scpn-reactor-kernels.git"
+        f"?rev={pin['source_commit']}#{pin['source_commit']}"
+    )
     workflows = REPO / ".github" / "workflows"
     for name in ("reusable-static-policy.yml", "reusable-tests.yml", "pre-commit.yml"):
         assert "pip install -e ." in (workflows / name).read_text(encoding="utf-8"), (
             name
         )
+    assert (
+        "scpn-reactor-kernels-native @ git+https://github.com/anulum/"
+        f"scpn-reactor-kernels.git@{pin['source_commit']}#subdirectory=rust"
+    ) in (workflows / "reusable-tests.yml").read_text(encoding="utf-8")

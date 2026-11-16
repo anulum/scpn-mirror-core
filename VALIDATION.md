@@ -304,6 +304,40 @@ gate:
   are exercised by test-constructed plans. Scopes are declarations;
   `mapping_state` stays `unmapped`.
 
+## Shared kernel dependency
+
+The Python dependency, optional CAD extra, native crate/lock and native CI
+install name `c83745c6011d9b0ea6c413cf0b7d607c724090e7`, distribution
+`2.0.0.dev0`. The manifest pins the inventory bytes at that object with
+SHA-256 `46dc34f9a3c7f498c454bd3219c0233848a71405371ee947d4ab79cf2f5d63f8`.
+Generated capability and Studio records carry the new manifest digest.
+The catalogue lifecycle points to this validation record while remaining
+`not_federated`; accepting the descriptor grants no execution authority.
+The diagnostic-envelope fixture preserves its producer revision, inner
+plan and review-only authority.
+
+`tests/test_kernel_migration.py` exercises the repair through the public
+device build and export APIs: all ten translated bodies keep volume within
+the library's coordinate-rounding bound, representable float64 measures
+survive small-coordinate intermediate underflow, and STL/GLB refuse facets
+lost in float32 storage. All five public regression cases fail on the former
+dependency. Native parity separately covers translated and small body
+meshes; agreement between backends is not an independent correctness proof.
+
+For the synthetic reference, all ten canonical meshes, STL and STEP bytes
+are unchanged. Tier-G1 record SHA-256 becomes
+`1fb01917c30fe5f4a182baf95a9d26094be8ef5dabc23be4cb334103dfb53a47`;
+CAD record SHA-256 becomes
+`49e512f20360b4ce822e547beff165e26cabe597555ddd2db644fb94da01c408`.
+Only volume measures and their derived CAD evidence change. GLB's binary
+chunk is unchanged; its JSON `extras.model_sha256` follows the new record.
+
+The STEP writer at this pin declares millimetres while the device supplies
+metre-valued coordinates. The existing numeric re-import check does not
+validate physical units. Metre-qualified STEP consumption requires the
+later shared-library unit repair and a separate dependency adoption; this
+migration does not establish that qualification.
+
 ## Device 3D model
 
 Evidence record of the `device_3d_model` capability

@@ -45,7 +45,7 @@
   "device_family": "magnetic_mirror",
   "evidence_maturity": "computational_prototype",
   "lifecycle": {
-    "evidence_pointer": null,
+    "evidence_pointer": "VALIDATION.md",
     "reason": "federation gates have not run; capabilities remain repository-local",
     "state": "not_federated"
   },
@@ -73,7 +73,7 @@
     "manifest_path": "reactor-domain.json",
     "manifest_schema": "scpn.reactor-domain.v1",
     "manifest_schema_version": "1.0.0",
-    "manifest_sha256": "91a0925780c73580938e5cd2665f2466e41f479b2e87142ff343554480e6f1cc",
+    "manifest_sha256": "d2dee36d4b2c852d43f69084cae48b8603c2bbff7f72e83e21902cd55014a4d6",
     "repository": "SCPN-MIRROR-CORE"
   },
   "spo_registry": {

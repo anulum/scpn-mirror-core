@@ -46,7 +46,7 @@ from scpn_mirror_core.geometry import (
 
 #: Digest of the reference tier-G1 model record at eight segments.
 REFERENCE_MODEL_SHA256 = (
-    "16cd38c8f926107f8519c589d7098dbffa4db394e06341f61142d6be2f95ac39"
+    "1fb01917c30fe5f4a182baf95a9d26094be8ef5dabc23be4cb334103dfb53a47"
 )
 
 #: Axial stations of the synthetic design, from the fixture numbers alone:

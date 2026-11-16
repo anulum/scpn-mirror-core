@@ -20,6 +20,8 @@ never by tolerance. All inputs are synthetic.
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from geometry_fixtures import (
@@ -164,3 +166,36 @@ def test_the_flux_tube_closed_forms_are_bit_exact_with_the_native_kernel() -> No
     assert bits(native.profile_lateral_area(flat_profile)) == bits(
         profile_lateral_area_m2(model.tube_profile)
     )
+
+
+@pytest.mark.parametrize(
+    ("scale", "offset"),
+    [(1.0, 100.0), (1.0, -100.0), (1.0, 1.0e8), (1.0e-100, 0.0)],
+)
+def test_device_mesh_measures_keep_native_parity_after_scaling_and_translation(
+    scale: float, offset: float
+) -> None:
+    """All ten actual body meshes retain bit parity outside ordinary coordinates."""
+    model = build_device_model(
+        reference_configuration(),
+        reference_geometry(),
+        REFERENCE_MIDPLANE_PLASMA_RADIUS_M,
+        reference_field_profile(),
+        8,
+    )
+    for mesh in model.meshes:
+        transformed = dataclasses.replace(
+            mesh,
+            vertices=tuple(
+                (x * scale + offset, y * scale + offset, z * scale + offset)
+                for x, y, z in mesh.vertices
+            ),
+        )
+        vertices = [value for vertex in transformed.vertices for value in vertex]
+        faces = [index for face in transformed.faces for index in face]
+        assert bits(native.mesh_volume(vertices, faces)) == bits(
+            transformed.signed_volume_m3()
+        ), mesh.name
+        assert bits(native.mesh_area(vertices, faces)) == bits(
+            transformed.surface_area_m2()
+        ), mesh.name

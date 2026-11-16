@@ -180,6 +180,16 @@ SCPN Mirror Core — CHANGELOG
 
 ### Changed
 
+- Adopt shared kernels `2.0.0.dev0` at immutable commit
+  `c83745c6011d9b0ea6c413cf0b7d607c724090e7` across Python, the CAD extra,
+  Rust and native CI. Regenerate manifest projections, the envelope's
+  manifest pin and both measure-bearing geometry identities. Bind the
+  catalogue lifecycle to its validation record without changing its state.
+  Add public
+  device regressions for translated volume, small-coordinate measures and
+  float32 export refusal, including native measure parity. Record the
+  retained STEP physical-unit limitation separately from numeric parity.
+
 - Native surface documentation is now a compiler gate, not a habit: the crate
   denies `missing_docs`, `missing_debug_implementations` and `unsafe_code`, and
   denies rustdoc's broken and private intra-doc links and invalid Rust code

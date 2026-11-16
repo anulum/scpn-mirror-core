@@ -22,7 +22,7 @@ dynamic = ["version"]
 # kernel inventory are recorded in reactor-domain.json (kernel_library) and
 # a contract test proves the two pins agree.
 dependencies = [
-    "scpn-reactor-kernels @ git+https://github.com/anulum/scpn-reactor-kernels.git@98e6de5139f8856f5d50b4ac86f531b7dc38c1dc",
+    "scpn-reactor-kernels @ git+https://github.com/anulum/scpn-reactor-kernels.git@c83745c6011d9b0ea6c413cf0b7d607c724090e7",
 ]
 
 # The tier-G2 CAD model is an optional capability, not a runtime
@@ -33,7 +33,7 @@ dependencies = [
 # environment that installs it, CI job included. It is an extra here too,
 # naming the same commit.
 [project.optional-dependencies]
-cad = ["scpn-reactor-kernels[cad] @ git+https://github.com/anulum/scpn-reactor-kernels.git@98e6de5139f8856f5d50b4ac86f531b7dc38c1dc"]
+cad = ["scpn-reactor-kernels[cad] @ git+https://github.com/anulum/scpn-reactor-kernels.git@c83745c6011d9b0ea6c413cf0b7d607c724090e7"]
 
 [tool.setuptools.dynamic]
 version = { attr = "scpn_mirror_core.__version__" }

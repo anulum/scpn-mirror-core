@@ -103,10 +103,15 @@ This repository owns, for the magnetic-mirror device family:
 
 This repository is not machine-ready, not safety-certified, and not
 reactor-ready. It contains no implemented solver, no controller, no
-benchmark result, no experimental correlation, no dataset, and no published
+experimental correlation, no dataset, and no published
 artefact, and no parameter set describes or validates any real machine. Cell-count, plugging-scheme, and fuel-cycle choices
 are configuration facets, not separate claims. No capability has reached any
 evidence-maturity state beyond `computational_prototype`.
+
+Local Python/native and CAD timings are recorded in
+[`docs/benchmarks.md`](docs/benchmarks.md). They measure synthetic operations
+on a shared workstation. The current dependency and export limitations are
+recorded in [`VALIDATION.md`](VALIDATION.md#shared-kernel-dependency).
 
 ## Architecture
 

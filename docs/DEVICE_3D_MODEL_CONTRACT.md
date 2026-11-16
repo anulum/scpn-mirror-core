@@ -157,6 +157,17 @@ interpolated endpoints.
 
 ## Determinism
 
+The current shared dependency is version `2.0.0.dev0` at
+`c83745c6011d9b0ea6c413cf0b7d607c724090e7`. Its corrected volume sum changes
+measure-bearing record identities, so a GLB carrying `model_sha256` changes
+that provenance field even when its geometry bytes stay identical.
+Both float32 writers refuse facets that cannot survive storage.
+
+The STEP writer at this pin declares millimetres for metre-valued device
+coordinates. Numeric round-trip agreement alone therefore does not qualify
+physical metre dimensions. The shared-library unit repair needs a separate
+adoption before these STEP files can be used as metre-qualified geometry.
+
 The same configuration, geometry, midplane radius, field profile and
 segment count always yield the same records, the same mesh bytes and the
 same export bytes, on every backend: the vertex coordinates are computed

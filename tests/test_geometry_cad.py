@@ -70,7 +70,7 @@ from scpn_mirror_core.geometry import (
 #: environment (cadquery 2.8.0, OCP 7.9.3.1); a back-end bump re-pins it
 #: as a governed data change (ADR 0008).
 REFERENCE_CAD_MODEL_SHA256 = (
-    "d6e7bba273cb158e81d7997d47d14580d00493847af4952e7ee759fd1feaa25f"
+    "49e512f20360b4ce822e547beff165e26cabe597555ddd2db644fb94da01c408"
 )
 
 

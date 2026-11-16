@@ -39,8 +39,8 @@ exists to prevent.
    manifest, the `pyproject.toml` dependency, the installed package
    version, the native crate's `Cargo.toml` and `Cargo.lock` and the CI
    install steps name one commit.
-3. `src/scpn_mirror_core/physics/numerics.py` is the only import site of
-   the library: it re-raises the library's domain refusal as the device
+3. `src/scpn_mirror_core/physics/numerics.py` is the import site of
+   the numerics group: it re-raises the library's domain refusal as the device
    `NumericsError` (a `DeviceConfigurationError`) with the library's
    message, so the consumer's error contract stays device-typed.
 4. The native crate `scpn-mirror-rs` depends on the library's Rust crate
@@ -63,3 +63,16 @@ repository as its second consumer and the first of the numerics kernel;
 because that entry changes the library's inventory, the digest pinned
 here names the inventory at the pinned commit, never the one that lists
 this consumer (the library's ADR 0004 fixes the same rule).
+
+## Dependency update — 2026-10-03
+
+Python, the optional CAD extra, the native crate and CI now name
+`c83745c6011d9b0ea6c413cf0b7d607c724090e7`, distribution version
+`2.0.0.dev0`, with inventory SHA-256
+`46dc34f9a3c7f498c454bd3219c0233848a71405371ee947d4ab79cf2f5d63f8`.
+The consumed geometry and CAD groups added by ADR0007 and ADR0008 remain
+listed in the manifest; they are imported by the geometry modules.
+The corrected local-origin volume sum changes measure-bearing record
+identities. Export paths now refuse facets lost during float32 storage.
+The dependency evidence and the retained STEP unit limitation are in
+[`VALIDATION.md`](../../VALIDATION.md#shared-kernel-dependency).
