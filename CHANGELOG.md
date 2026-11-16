@@ -94,6 +94,24 @@ SCPN Mirror Core — CHANGELOG
 
 ### Fixed
 
+- `tools/preflight.py` no longer fails in local checkouts for reasons CI
+  never sees. Both fixes are ported from SCPN-TOKAMAK-CORE.
+  - The documentation gate reads the Markdown files git would publish,
+    meaning tracked files plus new files that no ignore rule excludes. It
+    therefore skips a git-ignored private tree whose absolute links broke
+    the relative-link rule. Outside a work tree, or without git, it scans
+    as before.
+  - The shared-map search takes an optional upper bound
+    (`monorepo_map_path(..., search_limit=)`, passed through
+    `build_gate_plan(..., map_search_limit=)`). The standalone-checkout
+    tests now hold when pytest's temporary directory lies inside the
+    ecosystem tree. Production behaviour is unchanged.
+
+  New tests cover a tracked plus new but ignored tree, a deleted file, a
+  non-repository directory, a missing git, and the bounded and unbounded
+  map searches. Their git calls go through the gate runner, so no lint
+  exclusion is needed.
+
 - Added the nullable `timing_uncertainty_s` channel member (always `null`;
   no event-relative candidate is applicable) so the diagnostic-plan
   channel shape matches the portfolio-uniform envelope 1.1.0 contract;

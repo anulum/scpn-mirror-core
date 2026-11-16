@@ -95,8 +95,48 @@ def run_command_gate(name: str, command: list[str], root: Path) -> GateResult:
     return GateResult(name, passed=True, detail="")
 
 
+def git_markdown_files(root: Path) -> list[Path] | None:
+    """List the Markdown files git would publish from a work tree.
+
+    Parameters
+    ----------
+    root
+        Repository root to scan.
+
+    Returns
+    -------
+    list[Path] or None
+        Tracked files plus untracked files that no ignore rule excludes,
+        so a new document is checked before its first commit while private
+        ignored trees are not; ``None`` when ``root`` is not a git work
+        tree or git cannot run.
+    """
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "ls-files",
+                "-z",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "--",
+                "*.md",
+            ],
+            cwd=root,
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    if completed.returncode != 0:
+        return None
+    names = {name for name in completed.stdout.decode("utf-8").split("\0") if name}
+    return [root / name for name in sorted(names) if (root / name).is_file()]
+
+
 def iter_markdown_files(root: Path) -> Iterable[Path]:
-    """Yield every repository Markdown file outside skipped directories.
+    """Yield every repository Markdown file that documentation gates own.
 
     Parameters
     ----------
@@ -106,8 +146,15 @@ def iter_markdown_files(root: Path) -> Iterable[Path]:
     Yields
     ------
     Path
-        Markdown files in sorted order.
+        Markdown files in sorted order. In a git work tree these are the
+        files :func:`git_markdown_files` lists, so git-ignored private
+        trees are excluded; elsewhere every Markdown file outside the
+        skipped directories.
     """
+    listed = git_markdown_files(root)
+    if listed is not None:
+        yield from listed
+        return
     for path in sorted(root.rglob("*.md")):
         if SKIPPED_DIRECTORIES.isdisjoint(path.relative_to(root).parts[:-1]):
             yield path
@@ -162,34 +209,46 @@ def docs_gate(root: Path) -> GateResult:
     return GateResult("docs", passed=not findings, detail="; ".join(findings))
 
 
-def monorepo_map_path(root: Path) -> Path | None:
+def monorepo_map_path(root: Path, *, search_limit: Path | None = None) -> Path | None:
     """Locate the shared reactor-family map above one repository root.
 
     Parameters
     ----------
     root
         Repository root to search upward from.
+    search_limit
+        Optional ancestor at which the upward search stops; a map directly
+        under it is still found. ``None`` searches the whole parent chain.
+        Tests pass their temporary root so that an ambient map above it
+        cannot leak into a standalone-checkout case.
 
     Returns
     -------
     Path or None
         The first existing map file found walking the parent chain, or
-        ``None`` when no ancestor carries it.
+        ``None`` when no ancestor up to the limit carries it.
     """
+    limit = None if search_limit is None else search_limit.resolve()
     for parent in root.resolve().parents:
         candidate = parent / MAP_RELATIVE_TO_MONOREPO
         if candidate.is_file():
             return candidate
+        if parent == limit:
+            break
     return None
 
 
-def build_gate_plan(root: Path) -> list[tuple[str, list[str] | None]]:
+def build_gate_plan(
+    root: Path, *, map_search_limit: Path | None = None
+) -> list[tuple[str, list[str] | None]]:
     """Build the ordered gate plan for one repository root.
 
     Parameters
     ----------
     root
         Repository root the gates run against.
+    map_search_limit
+        Upper limit for the shared-map search; see :func:`monorepo_map_path`.
 
     Returns
     -------
@@ -200,7 +259,7 @@ def build_gate_plan(root: Path) -> list[tuple[str, list[str] | None]]:
     bin_dir = root / ".venv" / "bin"
     python = str(bin_dir / "python")
     validate = [python, "tools/validate_reactor_domain.py", "reactor-domain.json"]
-    map_path = monorepo_map_path(root)
+    map_path = monorepo_map_path(root, search_limit=map_search_limit)
     if map_path is not None:
         validate += ["--map", str(map_path)]
     return [

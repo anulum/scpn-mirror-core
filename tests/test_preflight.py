@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from preflight import (
     build_gate_plan,
     check_docs,
     docs_gate,
+    git_markdown_files,
     iter_markdown_files,
     main,
     monorepo_map_path,
@@ -69,6 +71,71 @@ def test_iter_markdown_files_skips_internal_directories(tmp_path: Path) -> None:
     (tmp_path / ".git" / "notes.md").write_text("skip", encoding="utf-8")
     found = [path.name for path in iter_markdown_files(tmp_path)]
     assert found == ["README.md"]
+
+
+def _git(root: Path, *args: str) -> None:
+    """Run one git command in a scratch repository through the gate runner."""
+    git = shutil.which("git")
+    assert git is not None
+    command = [
+        git,
+        "-c",
+        "user.name=t",
+        "-c",
+        "user.email=t@example.org",
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "core.hooksPath=/dev/null",
+        *args,
+    ]
+    result = run_command_gate("git", command, root)
+    assert result.passed, result.detail
+
+
+def test_git_tree_checks_tracked_and_new_docs_but_not_ignored(tmp_path: Path) -> None:
+    """In a work tree the gate reads what git would publish, nothing else."""
+    _git(tmp_path, "init", "-q")
+    (tmp_path / ".gitignore").write_text("private/\n", encoding="utf-8")
+    (tmp_path / "README.md").write_text("[gone](missing.md)", encoding="utf-8")
+    _git(tmp_path, "add", ".gitignore", "README.md")
+    _git(tmp_path, "commit", "-q", "-m", "seed")
+    (tmp_path / "NEW.md").write_text("[gone](also-missing.md)", encoding="utf-8")
+    (tmp_path / "private").mkdir()
+    (tmp_path / "private" / "notes.md").write_text(
+        "[gone](</abs/elsewhere.md>)", encoding="utf-8"
+    )
+    found = [path.name for path in iter_markdown_files(tmp_path)]
+    assert found == ["NEW.md", "README.md"]
+    findings = check_docs(tmp_path)
+    assert len(findings) == 2
+    assert not any("private" in finding for finding in findings)
+
+
+def test_git_tree_skips_a_tracked_file_deleted_from_disk(tmp_path: Path) -> None:
+    """A tracked document removed in the work tree is not read."""
+    _git(tmp_path, "init", "-q")
+    (tmp_path / "README.md").write_text("clean", encoding="utf-8")
+    (tmp_path / "OLD.md").write_text("clean", encoding="utf-8")
+    _git(tmp_path, "add", "README.md", "OLD.md")
+    _git(tmp_path, "commit", "-q", "-m", "seed")
+    (tmp_path / "OLD.md").unlink()
+    assert git_markdown_files(tmp_path) == [tmp_path / "README.md"]
+
+
+def test_git_listing_is_absent_outside_a_work_tree(tmp_path: Path) -> None:
+    """A directory that is not a git work tree falls back to a scan."""
+    assert git_markdown_files(tmp_path) is None
+
+
+def test_git_listing_is_absent_when_git_cannot_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Without a git executable the gate falls back instead of passing."""
+    monkeypatch.setenv("PATH", str(tmp_path / "no-bin"))
+    assert git_markdown_files(tmp_path) is None
+    (tmp_path / "README.md").write_text("[gone](missing.md)", encoding="utf-8")
+    assert len(check_docs(tmp_path)) == 1
 
 
 def test_check_docs_accepts_valid_links(tmp_path: Path) -> None:
@@ -153,7 +220,37 @@ def test_monorepo_map_path_is_none_in_a_standalone_checkout(tmp_path: Path) -> N
     """A checkout with no ancestor map reports absence rather than guessing."""
     repository = tmp_path / "standalone" / "REPO"
     repository.mkdir(parents=True)
+    assert monorepo_map_path(repository, search_limit=tmp_path) is None
+
+
+def test_monorepo_map_path_ignores_a_map_above_the_search_limit(tmp_path: Path) -> None:
+    """A map above the limit stays invisible; a map directly under it is found."""
+    outer = tmp_path / "outer"
+    map_file = outer / MAP_RELATIVE_TO_MONOREPO
+    map_file.parent.mkdir(parents=True)
+    map_file.write_text("{}", encoding="utf-8")
+    repository = outer / "inner" / "REPO"
+    repository.mkdir(parents=True)
+    assert monorepo_map_path(repository, search_limit=outer / "inner") is None
+    assert monorepo_map_path(repository, search_limit=outer) == map_file
+    assert monorepo_map_path(repository) == map_file
+
+
+def test_monorepo_map_path_walks_to_the_root_when_no_ancestor_carries_the_map(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A map name that no directory carries makes the search reach the root."""
+    import preflight as preflight_module
+
+    monkeypatch.setattr(
+        preflight_module,
+        "MAP_RELATIVE_TO_MONOREPO",
+        Path("no-such-ecosystem-directory") / "absent_repository_map.json",
+    )
+    repository = tmp_path / "anywhere" / "REPO"
+    repository.mkdir(parents=True)
     assert monorepo_map_path(repository) is None
+    assert monorepo_map_path(repository, search_limit=tmp_path / "unrelated") is None
 
 
 def test_gate_plan_carries_map_flag_when_an_ancestor_map_exists(
@@ -176,7 +273,8 @@ def test_gate_plan_omits_map_flag_in_a_standalone_checkout(tmp_path: Path) -> No
     """Without a reachable map the validator gate carries no ``--map``."""
     repository = tmp_path / "standalone" / "REPO"
     repository.mkdir(parents=True)
-    command = dict(build_gate_plan(repository))["reactor-domain"]
+    plan = dict(build_gate_plan(repository, map_search_limit=tmp_path))
+    command = plan["reactor-domain"]
     assert command is not None
     assert "--map" not in command
 
