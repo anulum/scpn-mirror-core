@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-09-03T16:45:07.395104+00:00",
+  "generated_at": "2026-11-16T12:26:01.463303+00:00",
   "label": "local",
   "parameters": {
     "repeats": 10,
     "warmup": 2
   },
   "platform": {
-    "commit": "3d3d89060999523fd62c7651115fd94dfe79250f",
-    "cpu_model": "11th Gen Intel(R) Core(TM) i5-11600K @ 3.90GHz",
+    "commit": "b9ad4d885956cfb845f3ecb701881400d8f09dc8",
+    "cpu_model": "Intel(R) Xeon(R) CPU E5-2640 0 @ 2.50GHz",
     "isolated_cores": false,
-    "load_average_1min_at_start": "10.68",
+    "load_average_1min_at_start": "3.99",
     "machine": "x86_64",
-    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.39",
+    "platform": "Linux-6.8.0-149-generic-x86_64-with-glibc2.39",
     "python": "3.12.3"
   },
   "results": [
@@ -19,12 +19,12 @@
       "backend": "cadquery_ocp",
       "name": "brep_build_and_manifest",
       "stats": {
-        "max_ms_per_operation": 88.214153,
-        "mean_ms_per_operation": 71.824635,
-        "min_ms_per_operation": 58.841376,
-        "p50_ms_per_operation": 64.655612,
-        "p95_ms_per_operation": 88.214153,
-        "p99_ms_per_operation": 88.214153
+        "max_ms_per_operation": 128.281576,
+        "mean_ms_per_operation": 115.7042127,
+        "min_ms_per_operation": 112.791518,
+        "p50_ms_per_operation": 113.362815,
+        "p95_ms_per_operation": 128.281576,
+        "p99_ms_per_operation": 128.281576
       },
       "status": "measured"
     },
@@ -32,12 +32,12 @@
       "backend": "cadquery_ocp",
       "name": "step_export_normalised",
       "stats": {
-        "max_ms_per_operation": 22.859662,
-        "mean_ms_per_operation": 17.7194961,
-        "min_ms_per_operation": 12.897275,
-        "p50_ms_per_operation": 17.012464,
-        "p95_ms_per_operation": 22.859662,
-        "p99_ms_per_operation": 22.859662
+        "max_ms_per_operation": 24.353686,
+        "mean_ms_per_operation": 23.694377199999998,
+        "min_ms_per_operation": 23.300461,
+        "p50_ms_per_operation": 23.672041,
+        "p95_ms_per_operation": 24.353686,
+        "p99_ms_per_operation": 24.353686
       },
       "status": "measured"
     },
@@ -45,12 +45,12 @@
       "backend": "cadquery_ocp",
       "name": "facet_ten_bodies",
       "stats": {
-        "max_ms_per_operation": 1192.872184,
-        "mean_ms_per_operation": 1075.1332311,
-        "min_ms_per_operation": 966.419961,
-        "p50_ms_per_operation": 1062.621746,
-        "p95_ms_per_operation": 1192.872184,
-        "p99_ms_per_operation": 1192.872184
+        "max_ms_per_operation": 2087.385308,
+        "mean_ms_per_operation": 1980.5941315,
+        "min_ms_per_operation": 1924.909906,
+        "p50_ms_per_operation": 1948.635852,
+        "p95_ms_per_operation": 2087.385308,
+        "p99_ms_per_operation": 2087.385308
       },
       "status": "measured"
     },
@@ -58,12 +58,12 @@
       "backend": "cadquery_ocp",
       "name": "device_cad_record_build",
       "stats": {
-        "max_ms_per_operation": 2704.917777,
-        "mean_ms_per_operation": 2391.8909675,
-        "min_ms_per_operation": 2009.806212,
-        "p50_ms_per_operation": 2434.329014,
-        "p95_ms_per_operation": 2704.917777,
-        "p99_ms_per_operation": 2704.917777
+        "max_ms_per_operation": 4568.094914,
+        "mean_ms_per_operation": 4137.1250031,
+        "min_ms_per_operation": 3815.415916,
+        "p50_ms_per_operation": 4038.914592,
+        "p95_ms_per_operation": 4568.094914,
+        "p99_ms_per_operation": 4568.094914
       },
       "status": "measured"
     }
