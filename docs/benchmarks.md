@@ -19,7 +19,7 @@ backends marked explicitly, provenance in the artefact).
 The records below were measured with the shared kernel library at
 `c83745c6011d9b0ea6c413cf0b7d607c724090e7` (`2.0.0.dev0`; see
 [the dependency validation](../VALIDATION.md#shared-kernel-dependency)),
-at commit `b9ad4d885956`, on a shared server rather than the workstation of the
+at commit `cacb3ce4cd8b`, on a shared server rather than the workstation of the
 earlier records. Numbers from the two hosts are not comparable, and the
 speed-up columns compare backends within one run. One-minute load averages
 at the start of the three runs were 2.41 to 6.00 on 24 logical CPUs.
@@ -44,7 +44,7 @@ transcendental functions through the pinned shared kernel library
 
 Artefact: `benchmarks/results/level0_physics.local.json`
 (schema `scpn-mirror-core.level0-physics-benchmark.v1`, generated 2026-11-16T12:12:33.657693+00:00, at commit
-`b9ad4d885956`).
+`cacb3ce4cd8b`).
 Host: Intel(R) Xeon(R) CPU E5-2640 0 @ 2.50GHz (ML350 server, 24 logical CPUs), Linux-6.8.0-149-generic-x86_64-with-glibc2.39, Python 3.12.3;
 load average at start 2.41; the process was restricted to eight logical CPUs, which other work
 could also use (cores not isolated, so treat the numbers as indicative).
@@ -74,7 +74,7 @@ a physics or engineering claim.
 
 Artefact: `benchmarks/results/device_model_3d.local.json`
 (schema `scpn-mirror-core.device-model-3d-benchmark.v1`, generated 2026-11-16T12:14:45.937289+00:00, at commit
-`b9ad4d885956`).
+`cacb3ce4cd8b`).
 Host: Intel(R) Xeon(R) CPU E5-2640 0 @ 2.50GHz (ML350 server, 24 logical CPUs), Linux-6.8.0-149-generic-x86_64-with-glibc2.39, Python 3.12.3;
 load average at start 6.00; the process was restricted to eight logical CPUs, which other work
 could also use (cores not isolated, so treat the numbers as indicative).
@@ -102,7 +102,7 @@ costs more than the sum of the rows above it.
 
 Artefact: `benchmarks/results/device_model_cad.local.json`
 (schema `scpn-mirror-core.device-model-cad-benchmark.v1`, generated 2026-11-16T12:26:01.463303+00:00, at commit
-`b9ad4d885956`).
+`cacb3ce4cd8b`).
 Host: Intel(R) Xeon(R) CPU E5-2640 0 @ 2.50GHz (ML350 server, 24 logical CPUs), Linux-6.8.0-149-generic-x86_64-with-glibc2.39, Python 3.12.3;
 load average at start 3.99; the process was restricted to eight logical CPUs, which other work
 could also use (cores not isolated, so treat the numbers as indicative).
