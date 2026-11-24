@@ -198,6 +198,13 @@ SCPN Mirror Core — CHANGELOG
 
 ### Changed
 
+- CI installs every Python set from hash-locked files, as SCPN-TOKAMAK-CORE
+  does. `make lock` now also writes `requirements-dev.txt`, `requirements-cad.txt`,
+  `requirements-kernels.txt` (the kernel library at `c83745c6` by source-archive
+  digest) and `requirements-build.txt` (maturin), from the new `.in` inputs and
+  `pyproject.toml`. The workflows install them with `--require-hashes` and the
+  package itself with `--no-deps`. The OpenSSF Scorecard found the unpinned
+  installs. The pins themselves are unchanged.
 - Adopt shared kernels `2.0.0.dev0` at immutable commit
   `c83745c6011d9b0ea6c413cf0b7d607c724090e7` across Python, the CAD extra,
   Rust and native CI. Regenerate manifest projections, the envelope's
