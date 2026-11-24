@@ -283,8 +283,8 @@ cadquery-ocp==7.9.3.1.1 \
     --hash=sha256:f85311fbd178e46009db5ab844c08b976075210a9d9a24fb37fe3aff05e66ff2 \
     --hash=sha256:fa1ef15f03c01f841e00d78251a2a493d7df945712c7804e60587c4bb4c1d28a
     # via cadquery
-cadquery-ocp-proxy==7.9.3.1.1 \
-    --hash=sha256:ca4164ec4b54956d9fc3e68c67d555b5486cb963c2f71e18df005ba16b921c91
+cadquery-ocp-proxy==8.0.1.1.0 \
+    --hash=sha256:98c71bb60cfb651afe179b134ab88580fd75384fce0cc6d633f727002cd18abd
     # via cadquery-ocp
 casadi==3.8.2 \
     --hash=sha256:118df1a9ae944a80989849ea5cfa76c20b28e95d6f568c9f989e8c16a66ab1db \
