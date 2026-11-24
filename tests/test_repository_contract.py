@@ -304,9 +304,16 @@ def test_kernel_library_pin_agrees_with_the_dependency_the_crate_and_the_package
     )
     workflows = REPO / ".github" / "workflows"
     for name in ("reusable-static-policy.yml", "reusable-tests.yml", "pre-commit.yml"):
-        assert "pip install -e ." in (workflows / name).read_text(encoding="utf-8"), (
-            name
-        )
+        text = (workflows / name).read_text(encoding="utf-8")
+        assert "pip install --no-deps -e ." in text, name
+        assert "--require-hashes" in text, name
+        assert "-r requirements-kernels.txt" in text, name
+    archive = (
+        "scpn-reactor-kernels @ https://github.com/anulum/scpn-reactor-kernels/"
+        f"archive/{pin['source_commit']}.tar.gz"
+    )
+    for lock_name in ("requirements-kernels.in", "requirements-kernels.txt"):
+        assert archive in (REPO / lock_name).read_text(encoding="utf-8"), lock_name
     assert (
         "scpn-reactor-kernels-native @ git+https://github.com/anulum/"
         f"scpn-reactor-kernels.git@{pin['source_commit']}#subdirectory=rust"
