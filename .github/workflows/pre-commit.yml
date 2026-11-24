@@ -34,7 +34,7 @@ jobs:
       - name: Build the pinned repository virtual environment
         run: |
           python -m venv .venv
-          .venv/bin/pip install -r requirements-dev.txt
-          .venv/bin/pip install -e .
+          .venv/bin/pip install --require-hashes -r requirements-dev.txt -r requirements-kernels.txt
+          .venv/bin/pip install --no-deps -e .
       - name: Run pre-commit on all files
         run: .venv/bin/pre-commit run --all-files --show-diff-on-failure
